@@ -33,24 +33,24 @@
 
   /* Font sizes */
   --text-xs: 0.75rem;      /* 12px */
-  --lineheight-xs: 1.5rem;
-  --fontweight-xs: 400;
+  --lineheight-xs: 1.5rem; /* 24px */
+  --fontweight-xs: 400; /* font medium */
 
   --text-sm: 0.875rem;     /* 14px */
-  --lineheight-sm: 1.25rem;
-  --fontweight-sm: 400;
+  --lineheight-sm: 1.25rem; /* 20px */
+  --fontweight-sm: 400; /* font medium */
 
   --text-base: 1rem;       /* 16px */
-  --lineheight-base: 1.5rem;
-  --fontweight-base: 400;
+  --lineheight-base: 1.5rem; /* 24px */
+  --fontweight-base: 400; /* font medium */
 
   --text-lg: 1.125rem;     /* 18px */
-  --lineheight-lg: 1.75rem;
-  --fontweight-lg: 500;
+  --lineheight-lg: 1.75rem; /* 28px */
+  --fontweight-lg: 500; /* font semibold */
 
   --text-xl: 1.25rem;      /* 20px */
-  --lineheight-xl: 1.25rem;
-  --fontweight-xl: 600;
+  --lineheight-xl: 1.25rem; /* 20px */
+  --fontweight-xl: 600; /* font bold */
 
   /* Font weights */
   --font-weight-regular: 400;
