@@ -1,4 +1,4 @@
-import MeasureTime from "../measureInfo/measureTime/MeasureTime";
+import MeasureInfo from "../measureInfo/MeasureInfo";
 
 export default function MeasurementCard() {
     return (
@@ -15,7 +15,7 @@ export default function MeasurementCard() {
                 border-[#D7D7D7]
             "
         >
-            <MeasureTime />
+            <MeasureInfo />
         </div>
     );
 }
