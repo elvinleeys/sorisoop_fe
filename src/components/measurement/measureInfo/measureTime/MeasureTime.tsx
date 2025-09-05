@@ -23,7 +23,7 @@ export default function MeasureTime() {
         if (status === "idle") {
             const timer = setInterval(() => {
                 setNow(new Date());
-            }, 60 * 1000); // 1분 간격 갱신
+            }, 1000);
 
             return () => clearInterval(timer);
         }
