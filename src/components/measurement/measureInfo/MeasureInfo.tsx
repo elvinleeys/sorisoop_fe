@@ -4,7 +4,7 @@ import MeasureTime from "./measureTime/MeasureTime";
 
 export default function MeasureInfo() {
     return (
-        <div className={`${flexRowBetween} w-full h-[1.5rem]`}>
+        <div className={`${flexRowBetween} w-full h-[1.5rem] mb-[1.0625rem]`}>
             <MeasureTime />
             <CurrentLocationDisplay />
         </div>
