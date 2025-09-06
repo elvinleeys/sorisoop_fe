@@ -1,4 +1,3 @@
-// currentLocationDisplay 컴포넌트
 "use client";
 
 import { flexRow } from "@/mixin/style";
@@ -8,17 +7,13 @@ import { useMeasurementStore } from "@/store/measurement/measurementStore";
 
 export default function CurrentLocationDisplay() {
   // location 상태와 setLocation 함수만 구조 분해
-  const { location, setLocation } = useMeasurementStore(state => ({
-    location: state.location,
-    setLocation: state.setLocation
-  }));
-
-  const placeName = location.placeName;
+  const placeName = useMeasurementStore(state => state.location.placeName);
+  const setLocation = useMeasurementStore(state => state.setLocation);
 
   useEffect(() => {
     // 스토어에 위치 정보가 이미 있으면, API 호출을 생략
-    if (location.latitude && location.longitude && location.placeName !== "위치 검색 중...") {
-      return;
+    if (placeName && placeName !== "위치 검색 중...") {
+       return;
     }
 
     if (!navigator.geolocation) {
@@ -53,7 +48,7 @@ export default function CurrentLocationDisplay() {
       },
       options
     );
-  }, [location, setLocation]); // 👈 의존성 배열이 location과 setLocation으로 간결해졌습니다.
+  }, [placeName, setLocation]); // 👈 의존성 배열이 location과 setLocation으로 간결해졌습니다.
 
   return (
     <div
