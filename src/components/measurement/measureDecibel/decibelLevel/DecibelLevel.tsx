@@ -20,14 +20,10 @@ const labelVariants = {
 };
 
 export default function MaxDecibel() {
-    const { decibelHistory, status } = useMeasurementStore();
+    const { avgDecibel, status } = useMeasurementStore();
 
-    const averageDb =
-        decibelHistory.length > 0
-        ? decibelHistory.reduce((sum, db) => sum + db, 0) / decibelHistory.length
-        : 0;
-
-    const level = getDecibelLevel(averageDb, status);
+    // store에서 이미 관리되는 avgDecibel 사용
+    const level = getDecibelLevel(avgDecibel, status);
 
     return (
         <AnimatePresence mode="wait" initial={false}>

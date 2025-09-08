@@ -3,16 +3,11 @@
 import { useMeasurementStore } from "@/store/measurement/measurementStore";
 
 export default function MaxDecibel() {
-    const { decibelHistory, status } = useMeasurementStore();
+    const { maxDecibel } = useMeasurementStore();
 
-    // 최대값 계산
-    const maxDbValue =
-        status !== "idle" && decibelHistory.length > 0
-        ? Math.max(...decibelHistory)
-        : 0;
-
-    const maxDb = maxDbValue > 0 ? maxDbValue.toFixed(0) : "00";
-
+    // 소수점 없이 반올림 → 문자열로 변환 → 최소 2자리로 패딩
+    const maxDb = Math.round(maxDecibel).toString().padStart(2, "0");
+    
     return (
         <div>
             <p 
