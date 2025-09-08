@@ -3,18 +3,16 @@
 import { flexRow } from "@/mixin/style";
 import Image from "next/image";
 import { useEffect } from "react";
-import { useMeasurementStore } from "@/store/measurement/measurementStore";
+import { useLocationStore } from "@/store/measurement/locationStore";
 
 export default function CurrentLocationDisplay() {
   // location 상태와 setLocation 함수만 구조 분해
-  const placeName = useMeasurementStore(state => state.location.placeName);
-  const setLocation = useMeasurementStore(state => state.setLocation);
+  const placeName = useLocationStore((state) => state.location.placeName);
+  const setLocation = useLocationStore((state) => state.setLocation);
 
   useEffect(() => {
-    // 스토어에 위치 정보가 이미 있으면, API 호출을 생략
-    if (placeName && placeName !== "위치 검색 중...") {
-       return;
-    }
+    // 스토어에 위치 정보가 이미 있으면, API 호출 생략
+    if (placeName && placeName !== "위치 검색 중...") return;
 
     if (!navigator.geolocation) {
       setLocation({ placeName: "위치 API 미지원", latitude: null, longitude: null });
@@ -33,11 +31,9 @@ export default function CurrentLocationDisplay() {
 
         try {
           const response = await fetch(`/api/location?x=${longitude}&y=${latitude}`);
-          if (!response.ok) {
-            throw new Error('서버에서 위치 정보 가져오기 실패');
-          }
+          if (!response.ok) throw new Error("서버에서 위치 정보 가져오기 실패");
           const data = await response.json();
-          setLocation({ placeName: data.placeName, latitude: latitude, longitude: longitude });
+          setLocation({ placeName: data.placeName, latitude, longitude });
         } catch (e) {
           console.error(e);
           setLocation({ placeName: "위치 가져오기 실패", latitude: null, longitude: null });
@@ -48,7 +44,7 @@ export default function CurrentLocationDisplay() {
       },
       options
     );
-  }, [placeName, setLocation]); // 👈 의존성 배열이 location과 setLocation으로 간결해졌습니다.
+  }, [placeName, setLocation]);
 
   return (
     <div
