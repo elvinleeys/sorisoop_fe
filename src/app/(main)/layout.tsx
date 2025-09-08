@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import '../globals.css';
 import NavBar from '@/components/nav/NavBar';
+import PageTransition from '@/components/pageTransition/PageTransition';
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -9,7 +10,9 @@ interface MainLayoutProps {
 export default function MainLayout({ children } : MainLayoutProps) {
     return (
         <>
-            {children}
+            <PageTransition>
+                {children}
+            </PageTransition>
             <NavBar />        
         </>
     );
