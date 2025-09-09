@@ -1,7 +1,7 @@
 "use client";
 
 import { flexRowBetween, flexRowCenter } from "@/mixin/style";
-import { useInfoModalStore } from "@/store/modal/modalStore";
+import { useInfoModalStore } from "@/store/modal/useInfoModalStore";
 import { InfoButton, Logo } from "soridam-design-system";
 
 export default function MainHeader() {
