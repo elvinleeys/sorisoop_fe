@@ -1,25 +1,29 @@
 "use client";
 
-import { flexRowCenter } from "@/mixin/style";
-import { Button, OneLineReviewInput } from "soridam-design-system";
+import { useReviewStore } from "@/store/register/reviewStore";
+import { OneLineReviewInput } from "soridam-design-system";
+import ReviewButton from "../reviewButton/ReviewButton";
 
-interface ReviewInputProps {
-    value: string;
-    onChange: (val: string) => void;
-    onSubmit: () => void;
-}
+export default function ReviewInput({ onSubmit }: { onSubmit: () => void }) {
+    const { 
+        value, 
+        setValue, 
+        submitAttempted, 
+        setSubmitAttempted 
+    } = useReviewStore();
 
-export default function ReviewInput({ value, onChange, onSubmit }: ReviewInputProps) {
     return (
         <>
             <div className="mb-[4.0625rem]">
-                <OneLineReviewInput value={value} onChange={onChange} maxLength={150} />
+                <OneLineReviewInput
+                value={value}
+                onChange={(val) => setValue(val)}
+                maxLength={150}
+                submitAttempted={submitAttempted}
+                onFocus={() => setSubmitAttempted(false)}
+                />
             </div>
-            <div className={`w-full h-[3.125rem] ${flexRowCenter}`}>
-                <Button buttonType="primary" size="large" onClick={onSubmit}>
-                    등록하기
-                </Button>
-            </div>
+            <ReviewButton onSubmit={onSubmit} />
         </>
-  );
+    );
 }
