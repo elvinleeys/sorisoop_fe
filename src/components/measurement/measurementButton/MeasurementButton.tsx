@@ -46,9 +46,8 @@ export default function MeasurementButton() {
 
     const handleSave = useCallback(() => {
         stopDecibel();
-        cancelMeasurement();
         router.push('/register'); // 측정 저장 후 /register 이동
-    }, [stopDecibel, cancelMeasurement, router]);
+    }, [stopDecibel, router]);
 
     return (
         <AnimatePresence mode="wait" initial={false}>

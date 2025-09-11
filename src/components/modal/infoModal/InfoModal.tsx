@@ -1,7 +1,7 @@
 "use client";
 
 import { flexCol, flexRowCenter } from "@/mixin/style";
-import { useInfoModalStore } from "@/store/modal/modalStore";
+import { useInfoModalStore } from "@/store/modal/useInfoModalStore";
 
 import { Button, Decibel, Modal } from "soridam-design-system";
 import { modalItems } from "./InfoModalData";
