@@ -1,0 +1,49 @@
+"use client";
+
+import { flexCol, flexRow, flexRowCenter } from "@/mixin/style";
+import Image from "next/image";
+import { CategoryIconButton } from "soridam-design-system";
+import { options, labelToCategoryMap } from "./Category";
+import { useFilterStore } from "@/store/filter/FilterStore";
+
+export default function CategorySection() {
+  const { selectedCategories, toggleCategory, close } = useFilterStore();
+
+  return (
+    <section className={`w-full ${flexCol} gap-[1.375rem]`}>
+      {/* 제목 + 중복선택 표시 */}
+      <div className={`w-full h-[2rem] ${flexRow} items-end justify-between`}>
+        <div className={`${flexRow} gap-[0.6875rem]`}>
+          <p className="text-base !font-medium text-neutral-black">
+            카테고리를 골라주세요.
+          </p>
+          <p className={`text-[#757575] text-sm ${flexRowCenter}`}>
+            중복선택 가능
+          </p>
+        </div>
+        <button onClick={close} className="w-8 h-8 relative">
+          <Image src="/icons/filter/close.svg" alt="close button" fill />
+        </button>
+      </div>
+
+      {/* 옵션 목록 */}
+      <div className={`${flexRow} overflow-x-auto whitespace-nowrap w-full`}>
+        <ul className={`${flexRow} items-center gap-2`}>
+          {options.map((option) => {
+            const category = labelToCategoryMap[option.label];
+            return (
+              <li key={option.label} className="inline-block">
+                <CategoryIconButton
+                  label={option.label}
+                  iconSrc={option.iconSrc}
+                  active={selectedCategories.includes(category)}
+                  onClick={() => toggleCategory(category)}
+                />
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </section>
+  );
+}
