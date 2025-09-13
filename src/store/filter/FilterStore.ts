@@ -8,9 +8,10 @@ interface FilterState {
   isOpen: boolean;
   selectedCategories: Category[];
   selectedNoiseLevels: NoiseLevel[];
-  selectedRadius: Radius | null;
+  selectedRadius: Radius;
   open: () => void;
   close: () => void;
+  closeWithReset: () => void;
   toggleCategory: (category: Category) => void;
   toggleNoiseLevel: (level: NoiseLevel) => void;
   selectRadius: (radius: Radius) => void;
@@ -21,9 +22,16 @@ export const useFilterStore = create<FilterState>((set) => ({
   isOpen: false,
   selectedCategories: [],
   selectedNoiseLevels: [],
-  selectedRadius: null,
+  selectedRadius: 500,
   open: () => set({ isOpen: true }),
   close: () => set({ isOpen: false }),
+  closeWithReset: () =>
+    set({
+      isOpen: false,
+      selectedCategories: [],
+      selectedNoiseLevels: [],
+      selectedRadius: 500,
+    }),
   toggleCategory: (category) =>
     set((state) => {
       const exists = state.selectedCategories.includes(category);
@@ -47,6 +55,6 @@ export const useFilterStore = create<FilterState>((set) => ({
     set({
       selectedCategories: [],
       selectedNoiseLevels: [],
-      selectedRadius: null,
+      selectedRadius: 500,
     }),
 }));
