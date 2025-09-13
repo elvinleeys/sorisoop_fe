@@ -20,6 +20,6 @@ const saveImg = {
 // NavList 아이템 예제
 export const navItems = [
   { href: '/', label: '소음 측정', img: measureImg },
-  { href: '/history', label: '소음 지도', img: mapImg },
+  { href: '/map', label: '소음 지도', img: mapImg },
   { href: '/save', label: '저장', img: saveImg },
 ];
