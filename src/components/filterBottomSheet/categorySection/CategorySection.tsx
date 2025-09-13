@@ -7,7 +7,7 @@ import { options, labelToCategoryMap } from "./Category";
 import { useFilterStore } from "@/store/filter/FilterStore";
 
 export default function CategorySection() {
-  const { selectedCategories, toggleCategory, close } = useFilterStore();
+  const { selectedCategories, toggleCategory, closeWithReset } = useFilterStore();
 
   return (
     <section className={`w-full ${flexCol} gap-[1.375rem]`}>
@@ -21,7 +21,7 @@ export default function CategorySection() {
             중복선택 가능
           </p>
         </div>
-        <button onClick={close} className="w-8 h-8 relative">
+        <button onClick={closeWithReset} className="w-8 h-8 relative">
           <Image src="/icons/filter/close.svg" alt="close button" fill />
         </button>
       </div>
