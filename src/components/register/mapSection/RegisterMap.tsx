@@ -9,8 +9,7 @@ import { useEffect } from "react";
 const getDecibelImg = (db: number) => {
     if (db <= 70) return "icons/quiet.svg";
     if (db > 70 && db < 100) return "icons/moderate.svg";
-    if (db >= 100) return "icons/loud.svg";
-    return "icons/default.svg";
+    return "icons/loud.svg";
 };
 
 export default function RegisterMap() {
