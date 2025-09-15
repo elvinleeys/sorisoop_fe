@@ -1,7 +1,5 @@
 import { SaveHeader } from "@/components/header";
 import GuestNoiseDataView from "@/components/save/guestNoiseDataView/GuestNoiseDataView";
-import NoData from "@/components/save/noData/NoData";
-import SaveResult from "@/components/save/saveResult/SaveResult";
 import { flexCol } from "@/mixin/style";
 
 export default function SavePage() {
@@ -19,7 +17,7 @@ export default function SavePage() {
                     overflow-y-scroll
                 `}
             >
-                <SaveResult id="1" />
+                <GuestNoiseDataView />
             </main>
         </>
     );
