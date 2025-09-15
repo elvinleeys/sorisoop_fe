@@ -26,16 +26,15 @@ export default function BackModal() {
                     <div 
                         className={`
                             ${flexColCenter} 
-                            w-full 
-                            h-[3rem]
+                            w-full
                             pt-[0.5rem]
                             px-[0.71875rem]
                         `}
                     >
-                        <p className="text-base font-medium text-black">
+                        <p className="text-base !font-medium text-black">
                             저장을 위해 한줄평을 작성하시겠어요?
                         </p>
-                        <p className="text-base font-medium text-black">
+                        <p className="text-base !font-medium text-black">
                             아니면 나가시겠어요?
                         </p>
                     </div>
@@ -45,6 +44,9 @@ export default function BackModal() {
                             h-[4rem]
                             ${flexRowCenter} 
                             gap-[0.436875rem]
+                            px-[1.28125rem]
+                            pt-[1rem]
+                            pb-[0.5rem]
                         `}
                     >
                         <Button 
