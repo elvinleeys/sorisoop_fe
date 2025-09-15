@@ -16,16 +16,15 @@ export default function DeleteModal() {
                     <div 
                         className={`
                             ${flexColCenter} 
-                            w-full 
-                            h-[3rem]
-                            pt-[0.5rem]
-                            px-[0.71875rem]
+                            w-full
+                            pt-2
+                            px-9
                         `}
                     >
-                        <p className="text-base font-medium text-black">
+                        <p className="text-base !font-medium text-black">
                             이 게시글을 삭제하시겠습니까?
                         </p>
-                        <p className="text-base font-medium text-black">
+                        <p className="text-base !font-medium text-black">
                             삭제 후 복구가 불가능합니다.
                         </p>
                     </div>
@@ -35,6 +34,9 @@ export default function DeleteModal() {
                             h-[4rem]
                             ${flexRowCenter} 
                             gap-[0.436875rem]
+                            px-[1.28125rem]
+                            pt-4
+                            pb-2
                         `}
                     >
                         <Button 
