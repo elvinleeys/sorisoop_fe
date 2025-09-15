@@ -3,6 +3,7 @@ import "./globals.css";
 import 'soridam-design-system/styles';
 import InfoModal from "@/components/modal/infoModal/InfoModal";
 import BackModal from "@/components/modal/backModal/BackModal";
+import SideBar from "@/components/sideBar/SideBar";
 
 export const metadata: Metadata = {
   title: 'Soridam Noise Map', // 사이트 기본 제목
@@ -21,6 +22,7 @@ export default function RootLayout({
           {children}
           <InfoModal />
           <BackModal />
+          <SideBar />
       </body>
     </html>
   );

@@ -3,21 +3,11 @@
 import React from "react";
 import ClientOnlyPortal from "@/components/clientOnlyPortal/ClientOnlyPortal";
 import { Button, Modal } from "soridam-design-system";
-import { useBackModalStore } from "@/store/modal/useBackModalStore";
+import { useDeleteModalStore } from "@/store/modal/useDeleteModalStore";
 import { flexColCenter, flexRowCenter } from "@/mixin/style";
-import { useMeasurementStore } from "@/store/measurement/measurementStore";
-import { useRouter } from "next/navigation";
 
-export default function BackModal() {
-    const { isOpen, close } = useBackModalStore();
-    const cancelMeasurement = useMeasurementStore((state) => state.cancelMeasurement);
-    const router = useRouter();
-
-    const handleGoBack = () => {
-        cancelMeasurement(); // 데이터 초기화
-        close();             // 모달 닫기
-        router.push("/");    // 메인 페이지로 이동
-    };
+export default function DeleteModal() {
+    const { isOpen, close } = useDeleteModalStore();
 
     return (
         <ClientOnlyPortal containerId="modal">
@@ -27,15 +17,15 @@ export default function BackModal() {
                         className={`
                             ${flexColCenter} 
                             w-full
-                            pt-[0.5rem]
-                            px-[0.71875rem]
+                            pt-2
+                            px-9
                         `}
                     >
                         <p className="text-base !font-medium text-black">
-                            저장을 위해 한줄평을 작성하시겠어요?
+                            이 게시글을 삭제하시겠습니까?
                         </p>
                         <p className="text-base !font-medium text-black">
-                            아니면 나가시겠어요?
+                            삭제 후 복구가 불가능합니다.
                         </p>
                     </div>
                     <div 
@@ -45,23 +35,23 @@ export default function BackModal() {
                             ${flexRowCenter} 
                             gap-[0.436875rem]
                             px-[1.28125rem]
-                            pt-[1rem]
-                            pb-[0.5rem]
+                            pt-4
+                            pb-2
                         `}
                     >
                         <Button 
                             buttonType="secondary" 
                             size="xsmall"
-                            onClick={handleGoBack}    
+                            onClick={close}    
                         >
-                            뒤로 가기
+                            취소하기
                         </Button>
                         <Button 
                             buttonType="primary" 
                             size="xsmall"
                             onClick={close}
                         >
-                            작성하기
+                            삭제하기
                         </Button>
                     </div>
                 </div>
