@@ -7,9 +7,9 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 const getDecibelImg = (db: number) => {
-    if (db <= 70) return "icons/quiet.svg";
-    if (db > 70 && db < 100) return "icons/moderate.svg";
-    return "icons/loud.svg";
+    if (db <= 70) return "/icons/quiet.svg";
+    if (db > 70 && db < 100) return "/icons/moderate.svg";
+    return "/icons/loud.svg";
 };
 
 export default function RegisterMap() {
