@@ -11,7 +11,7 @@ export default function SignUpLayout({ children }: SignUpLayoutProps) {
         <>
             <SignUpHeader />
             <ExternalStepIndicator />
-            <main>
+            <main className="px-4 pb-16.5">
                 {children}
             </main>
         </>
