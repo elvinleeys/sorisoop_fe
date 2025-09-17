@@ -22,12 +22,12 @@ export default function MeasureTime() {
 
     return (
         <div className={`${flexRow} items-center gap-[0.25rem]`}>
-            <p className="text-base text-neutral-sub">
+            <time className="text-base text-neutral-sub">
                 {date}
-            </p>
-            <p className="text-base text-neutral-sub">
+            </time>
+            <time className="text-base text-neutral-sub">
                 {time}
-            </p>
+            </time>
         </div>
     );
 }
