@@ -23,7 +23,7 @@ export default function GuestNoiseDataView() {
                 href="/sign-in" 
                 className={`
                     ${flexRowCenter}
-                    w-full
+                    w-85
                     h-[3.125rem] 
                     rounded-[3.625rem] 
                     bg-primary
