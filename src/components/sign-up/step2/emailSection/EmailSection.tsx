@@ -13,17 +13,41 @@ export default function EmailSection({ onValidEmail }: EmailSectionProps) {
     const { formData } = useSignUpStore();
     const [email, setEmail] = useState(formData.email ?? "");
     const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(e.target.value);
         setError(""); // 입력 중에는 에러 숨김
     };
 
-    const handleBlur = () => {
+    const handleBlur = async () => {
         const validationError = validateEmail(email);
         setError(validationError ?? "");
-        if (!validationError) {
-            onValidEmail(email); // 상위에 "유효한 이메일" 전달
+        setSuccess(""); // 새로 blur하면 성공 메시지 초기화
+        
+        if (validationError) return;
+
+        try{
+            const res = await fetch("/api/auth/check-email", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email }),
+            });
+
+            const data = await res.json();
+
+            if (data.exists) {
+                setError("이미 등록된 이메일입니다.");
+                setSuccess("");
+            } else {
+                setError("");
+                setSuccess("사용 가능한 이메일입니다.");
+                onValidEmail(email); // 상위로 전달
+            }
+        } catch (err) {
+            console.error(err);
+            setError("서버와 통신 중 오류가 발생했습니다.");
+            setSuccess("");
         }
     };
 
@@ -54,6 +78,11 @@ export default function EmailSection({ onValidEmail }: EmailSectionProps) {
             {error && (
                 <p className="text-error text-sm text-right mt-2">
                     {error}
+                </p>
+            )}
+            {success && (
+                <p className="text-primary text-sm text-right mt-2">
+                    {success}
                 </p>
             )}
         </section>
