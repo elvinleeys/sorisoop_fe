@@ -14,27 +14,43 @@ export default function PasswordSection({ onValidPassword }: PasswordSectionProp
     const [password, setPassword] = useState(formData.password ?? "");
     const [confirm, setConfirm] = useState(formData.password ?? "");
     const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPassword(e.target.value);
         setError("");
+        setSuccess("");
     };
 
     const handleConfirmChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setConfirm(e.target.value);
         setError("");
+        setSuccess("");
     };
 
     const handlePasswordBlur = () => {
         const validationError = validatePasswordValue(password);
         setError(validationError ?? "");
+        setSuccess("");
     };
 
     const handleConfirmBlur = () => {
         const passwordError = validatePasswordValue(password);
         const confirmError = validatePasswordConfirm(password, confirm);
-        setError(confirmError ? confirmError : passwordError ?? "");
-        onValidPassword(!confirmError ? password : null);
+        
+        if (confirmError) {
+            setError(confirmError);
+            setSuccess("");
+            onValidPassword(null);
+        } else if (passwordError) {
+            setError(passwordError);
+            setSuccess("");
+            onValidPassword(null);
+        } else {
+            setError("");
+            setSuccess("사용 가능한 비밀번호입니다.");
+            onValidPassword(password);
+        }
     };
 
     return (
@@ -81,6 +97,11 @@ export default function PasswordSection({ onValidPassword }: PasswordSectionProp
             {error && (
                 <p className="text-error text-sm text-right mt-2">
                     {error}
+                </p>
+            )}
+            {success && (
+                <p className="text-primary text-sm text-right mt-2">
+                    {success}
                 </p>
             )}
         </section>
