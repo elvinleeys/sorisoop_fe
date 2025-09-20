@@ -18,14 +18,14 @@ export async function POST(req: Request) {
 
         await dbConnect();
 
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email }).select("+password");
         if (!user) {
-            return NextResponse.json({ message: "이메일 또는 비밀번호가 올바르지 않습니다." }, { status: 401 });
+            return NextResponse.json({ message: "아이디 또는 비밀번호가 맞지 않습니다. 다시 확인해주세요." }, { status: 401 });
         }
 
         const ok = await bcrypt.compare(password, user.password);
         if (!ok) {
-            return NextResponse.json({ message: "이메일 또는 비밀번호가 올바르지 않습니다." }, { status: 401 });
+            return NextResponse.json({ message: "아이디 또는 비밀번호가 맞지 않습니다. 다시 확인해주세요." }, { status: 401 });
         }
 
         // JWT 시크릿
