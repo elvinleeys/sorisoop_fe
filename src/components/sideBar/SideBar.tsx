@@ -5,9 +5,26 @@ import ClientOnlyPortal from "../clientOnlyPortal/ClientOnlyPortal";
 import { useSidebarStore } from "@/store/sideBar/SideBarStore";
 import { BackButton } from "soridam-design-system";
 import { flexCol, flexRow } from "@/mixin/style";
+import { useAuthStore } from "@/store/auth/authStore";
+import Link from "next/link";
+import { useLogoutModalStore } from "@/store/modal/useLogoutModalStore";
+import { useDeleteAccountModalStore } from "@/store/modal/useDeleteAccountModalStore";
 
 export default function SideBar() {
-    const { isOpen, close } = useSidebarStore();
+    const { isOpen, close: sidebarClose } = useSidebarStore();
+    const { accessToken } = useAuthStore();
+    const { open: logoutModalOpen } = useLogoutModalStore();
+    const { open: deleteAccountModalOpen } = useDeleteAccountModalStore();
+
+    const handleLogoutModal = () => {
+        sidebarClose();
+        logoutModalOpen();
+    }
+
+    const handleDeleteAccountModal = () => {
+        sidebarClose();
+        deleteAccountModalOpen();
+    }
 
     return(
         <ClientOnlyPortal containerId="modal">
@@ -32,7 +49,7 @@ export default function SideBar() {
                                 pb-[0.375rem]
                             `}
                         >
-                            <BackButton size="md" onClick={close}/>
+                            <BackButton size="md" onClick={sidebarClose}/>
                             <h2 className="text-lg leading-0.5 text-neutral-black">
                                 설정
                             </h2>
@@ -94,12 +111,47 @@ export default function SideBar() {
                                 <p className="text-sm text-neutral-sub">
                                     오픈소스 라이선스
                                 </p>
-                                <p className="text-sm leading-1 text-[#0F6FFF]">
-                                    로그아웃
-                                </p>
-                                <p className="text-sm leading-1 text-[#FF826E]">
-                                    회원탈퇴
-                                </p>
+                                {!accessToken ? (
+                                    // 로그인 안 된 상태 → /sign-in으로 이동
+                                    <Link
+                                        href="/sign-in"
+                                        className="
+                                            text-sm 
+                                            leading-1 
+                                            text-[#0F6FFF]
+                                        "
+                                        onClick={sidebarClose}
+                                    >
+                                        로그인
+                                    </Link>
+                                ) : (
+                                    <>
+                                        <button
+                                            onClick={handleLogoutModal}
+                                            className="
+                                                text-start
+                                                text-sm 
+                                                leading-1 
+                                                text-[#0F6FFF] 
+                                                cursor-pointer
+                                            "
+                                        >
+                                            로그아웃
+                                        </button>
+                                        <button
+                                            onClick={handleDeleteAccountModal}
+                                            className="
+                                                text-start
+                                                text-sm 
+                                                leading-1 
+                                                text-[#FF826E] 
+                                                cursor-pointer
+                                            "
+                                        >
+                                            회원탈퇴
+                                        </button>
+                                    </>
+                                )}
                             </section>
                         </main>
                     </motion.div>
