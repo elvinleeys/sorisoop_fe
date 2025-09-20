@@ -4,6 +4,9 @@ import 'soridam-design-system/styles';
 import InfoModal from "@/components/modal/infoModal/InfoModal";
 import BackModal from "@/components/modal/backModal/BackModal";
 import SideBar from "@/components/sideBar/SideBar";
+import LogoutModal from "@/components/modal/logoutModal/LogoutModal";
+import DeleteAccountModal from "@/components/modal/deleteAccountModal/DeleteAccountModal";
+import ToastContainer from "@/components/toast/ToastContainer";
 
 export const metadata: Metadata = {
   title: 'Soridam Noise Map', // 사이트 기본 제목
@@ -23,6 +26,9 @@ export default function RootLayout({
           <InfoModal />
           <BackModal />
           <SideBar />
+          <LogoutModal />
+          <DeleteAccountModal />
+          <ToastContainer />
       </body>
     </html>
   );
