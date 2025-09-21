@@ -3,7 +3,6 @@ import "./globals.css";
 import 'soridam-design-system/styles';
 import InfoModal from "@/components/modal/infoModal/InfoModal";
 import BackModal from "@/components/modal/backModal/BackModal";
-import SideBar from "@/components/sideBar/SideBar";
 import LogoutModal from "@/components/modal/logoutModal/LogoutModal";
 import DeleteAccountModal from "@/components/modal/deleteAccountModal/DeleteAccountModal";
 import ToastContainer from "@/components/toast/ToastContainer";
@@ -25,7 +24,6 @@ export default function RootLayout({
           {children}
           <InfoModal />
           <BackModal />
-          <SideBar />
           <LogoutModal />
           <DeleteAccountModal />
           <ToastContainer />
