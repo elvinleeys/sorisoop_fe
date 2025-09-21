@@ -1,5 +1,15 @@
-
 import { NextRequest, NextResponse } from 'next/server';
+
+type CategoryMap = {
+  [key: string]: { code: "CT1" | "AT4" | "FD6" | "CE7"; name: "문화시설" | "관광명소" | "음식점" | "카페" };
+};
+
+const categoryMapping: CategoryMap = {
+  "문화시설": { code: "CT1", name: "문화시설" },
+  "관광명소": { code: "AT4", name: "관광명소" },
+  "음식점": { code: "FD6", name: "음식점" },
+  "카페": { code: "CE7", name: "카페" },
+};
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,7 +27,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 1. 주변 장소 검색 (searchNearbyPlace)
-    const placeApiUrl = `https://dapi.kakao.com/v2/local/search/keyword.json?query=&x=${x}&y=${y}&radius=500&size=1`;
+    const placeApiUrl = `https://dapi.kakao.com/v2/local/search/keyword.json?query=&x=${x}&y=${y}&radius=1000&size=1`;
     const placeRes = await fetch(placeApiUrl, {
       headers: {
         Authorization: `KakaoAK ${KAKAO_REST_API_KEY}`,
@@ -33,10 +43,23 @@ export async function GET(request: NextRequest) {
     const placeData = await placeRes.json();
 
     if (placeData.documents?.length > 0) {
-      return NextResponse.json({ placeName: placeData.documents[0].place_name });
+      const place = placeData.documents[0];
+
+      const categoryInfo = categoryMapping[place.category_group_name] || { code: null, name: null };
+
+      return NextResponse.json({
+        kakaoPlaceId: place.id,
+        placeName: place.place_name,
+        location: {
+          type: "Point",
+          coordinates: [parseFloat(place.x), parseFloat(place.y)], // [경도, 위도]
+        },
+        categoryCode: categoryInfo.code,
+        categoryName: categoryInfo.name,
+      });
     }
 
-    // 2. 좌표 → 주소 변환 (coord2Address)
+    // 2. 좌표 → 주소 변환 fallback
     const addressApiUrl = `https://dapi.kakao.com/v2/local/geo/coord2address.json?x=${x}&y=${y}`;
     const addressRes = await fetch(addressApiUrl, {
       headers: {
@@ -51,17 +74,34 @@ export async function GET(request: NextRequest) {
       const addr = addressData.documents[0];
       const roadName = addr.road_address?.building_name;
       const jibunFull = addr.address?.address_name;
+      const simplifiedAddress = roadName && roadName.trim() !== "" 
+        ? roadName 
+        : jibunFull 
+          ? jibunFull.split(" ").slice(-2).join(" ") 
+          : "위치 정보 없음";
 
-      if (roadName && roadName.trim() !== "") {
-        return NextResponse.json({ placeName: roadName });
-      } else if (jibunFull) {
-        const parts = jibunFull.split(" ");
-        const simplifiedAddress = parts.length >= 2 ? parts.slice(-2).join(" ") : parts[parts.length - 1];
-        return NextResponse.json({ placeName: simplifiedAddress });
-      }
+      return NextResponse.json({
+        kakaoPlaceId: null,
+        placeName: simplifiedAddress,
+        location: {
+          type: "Point",
+          coordinates: [parseFloat(x), parseFloat(y)],
+        },
+        categoryCode: null,
+        categoryName: null,
+      });
     }
 
-    return NextResponse.json({ placeName: '위치 정보 없음' });
+    return NextResponse.json({
+      kakaoPlaceId: null,
+      placeName: "위치 정보 없음",
+      location: {
+        type: "Point",
+        coordinates: [parseFloat(x), parseFloat(y)],
+      },
+      categoryCode: null,
+      categoryName: null,
+    });
 
   } catch (error) {
     console.error(error);
