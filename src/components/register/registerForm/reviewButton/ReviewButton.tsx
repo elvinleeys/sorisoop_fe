@@ -3,10 +3,11 @@ import { Button } from "soridam-design-system";
 import { useReviewStore } from "@/store/register/reviewStore";
 
 interface ReviewButtonProps {
+    isSubmitting: boolean
     onSubmit: () => void;
 }
 
-function ReviewButtonBase({ onSubmit }: ReviewButtonProps) {
+function ReviewButtonBase({ onSubmit, isSubmitting }: ReviewButtonProps) {
     // 타입 명시
     const isValid = useReviewStore((state) => state.isValid);
 
@@ -15,9 +16,10 @@ function ReviewButtonBase({ onSubmit }: ReviewButtonProps) {
             <Button
                 buttonType={isValid ? "primary" : "secondary"}
                 size="large"
+                disabled={isSubmitting}
                 onClick={onSubmit}
             >
-                등록하기
+                {isSubmitting ? "등록 중..." : "등록하기"}
             </Button>
         </div>
     );

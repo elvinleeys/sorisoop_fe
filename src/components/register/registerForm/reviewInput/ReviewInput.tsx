@@ -4,7 +4,12 @@ import { useReviewStore } from "@/store/register/reviewStore";
 import { OneLineReviewInput } from "soridam-design-system";
 import ReviewButton from "../reviewButton/ReviewButton";
 
-export default function ReviewInput({ onSubmit }: { onSubmit: () => void }) {
+interface ReviewInputProps {
+    onSubmit: () => void;
+    isSubmitting: boolean;
+}
+
+export default function ReviewInput({ onSubmit, isSubmitting }: ReviewInputProps) {
     const { 
         value, 
         setValue, 
@@ -23,7 +28,7 @@ export default function ReviewInput({ onSubmit }: { onSubmit: () => void }) {
                 onFocus={() => setSubmitAttempted(false)}
                 />
             </div>
-            <ReviewButton onSubmit={onSubmit} />
+            <ReviewButton onSubmit={onSubmit} isSubmitting={isSubmitting}/>
         </>
     );
 }
