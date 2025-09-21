@@ -60,9 +60,8 @@ export default function SignInForm () {
     return (
         <section 
             className={`
-                ${flexColCenter} 
-                justify-center 
-                gap-9.5
+                ${flexColCenter}
+                gap-2
                 mb-6
             `}
         >
@@ -75,9 +74,11 @@ export default function SignInForm () {
             >
                 <EmailInput value={email} onChange={(e) => setEmail(e.target.value)} />
                 <PasswordInput value={password} onChange={(e) => setPassword(e.target.value)}/>
-                {error && <p className="text-error text-sm text-right mt-2">{error}</p>}
             </div>
-            <Button 
+            <p className="w-full min-h-5 text-error text-sm text-center mb-0.5">
+                {error ?? ""}
+            </p>
+            <Button
                 buttonType={loading ? "secondary" : "primary"} 
                 size="large" 
                 onClick={handleLogin}
