@@ -1,18 +1,29 @@
 "use client";
 
 import { flexCol, flexRow, flexRowBetween, flexRowCenter } from "@/mixin/style";
+import { Measurement } from "@/types/save/savelist";
 import { formatDateTime } from "@/util/formatDateTime";
 import Image from "next/image";
 import Link from "next/link";
 import { Decibel } from "soridam-design-system";
 
-interface SaveResultProps {
-  id: string;
-}
+export default function SaveResult({
+  id,
+  placeName,
+  avgDecibel,
+  maxDecibel,
+  measuredAt,
+}: Measurement) {
+    const dateTime = new Date(measuredAt)
+    const { date, time } = formatDateTime(dateTime);
 
-export default function SaveResult({ id }: SaveResultProps) {
-    const date1 = new Date();
-    const { date, time } = formatDateTime(date1);
+    const getDecibelLevel = (db: number) => {
+        if (db <= 70) return "quiet";
+        if (db > 70 && db < 100) return "moderate";
+        return "loud";
+    };
+
+    const decibelLevel = getDecibelLevel(avgDecibel);
 
     return (
         <Link href={`/save/${id}`} className="block">
@@ -37,7 +48,7 @@ export default function SaveResult({ id }: SaveResultProps) {
                         p-2.5
                     `}
                 >
-                    <Decibel level="quiet" size="lg" />
+                    <Decibel level={decibelLevel} size="lg" />
                 </div>
                 <div 
                     className={`
@@ -51,7 +62,7 @@ export default function SaveResult({ id }: SaveResultProps) {
                     <div className={`${flexRowBetween}`}>
                         <div className={`${flexCol} gap-1`}>
                             <h3 className="text-base !font-bold text-neutral-black">
-                                합정 앤트러사이트
+                                {placeName}
                             </h3>
                             <div className={`${flexRow} gap-1`}>
                                 <time className="text-sm text-neutral-sub">
@@ -79,7 +90,7 @@ export default function SaveResult({ id }: SaveResultProps) {
                                 text-neutral-sub
                             `}
                         >
-                            평균 65
+                            평균 {avgDecibel.toFixed(0)}
                         </span>
                         <span 
                             className={`
@@ -93,7 +104,7 @@ export default function SaveResult({ id }: SaveResultProps) {
                                 text-neutral-sub
                             `}
                         >
-                            최대 65
+                            최대 {maxDecibel.toFixed(0)}
                         </span>
                     </div>
                 </div>
