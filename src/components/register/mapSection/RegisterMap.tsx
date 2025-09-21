@@ -16,7 +16,10 @@ export default function RegisterMap() {
     const router = useRouter();
     const { avgDecibel } = useMeasurementStore();
     const { location } = useLocationStore();
-    const { latitude: lat, longitude: lng } = location || {};
+    // GeoJSON coordinates: [longitude, latitude]
+    const coordinates = location.location?.coordinates;
+    const lat = coordinates?.[1];
+    const lng = coordinates?.[0];
 
     // ✅ 위치 정보 없으면 redirect
     useEffect(() => {
