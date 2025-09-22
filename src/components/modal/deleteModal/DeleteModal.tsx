@@ -5,9 +5,39 @@ import ClientOnlyPortal from "@/components/clientOnlyPortal/ClientOnlyPortal";
 import { Button, Modal } from "soridam-design-system";
 import { useDeleteModalStore } from "@/store/modal/useDeleteModalStore";
 import { flexColCenter, flexRowCenter } from "@/mixin/style";
+import { useRouter } from "next/navigation";
+import { useToastStore } from "@/store/toast/useToastStore";
+import { fetchWrapper } from "@/lib/fetchWrapper";
 
-export default function DeleteModal() {
+interface DeleteResponse {
+  success: boolean;
+  message?: string;
+}
+
+export default function DeleteModal({ listId } : {listId: string}) {
     const { isOpen, close } = useDeleteModalStore();
+    const addToast = useToastStore((state) => state.addToast);
+    const router = useRouter();
+
+    const handleDelete = async () => {
+        try {
+            const res = await fetchWrapper<DeleteResponse>(`/api/delete-measurement/${listId}`, {
+                method: "DELETE",
+                credentials: "include",
+            });
+
+            if (res.success) {
+                addToast(res.message || "삭제가 완료되었습니다.", 2000);
+                close();
+                router.push("/save");
+            } else {
+                throw new Error(res.message || "삭제 실패");
+            }
+        } catch (err) {
+            console.error(err);
+            addToast("삭제 중 오류 발생", 2000);
+        }
+    };
 
     return (
         <ClientOnlyPortal containerId="modal">
@@ -49,7 +79,7 @@ export default function DeleteModal() {
                         <Button 
                             buttonType="primary" 
                             size="xsmall"
-                            onClick={close}
+                            onClick={handleDelete}
                         >
                             삭제하기
                         </Button>
