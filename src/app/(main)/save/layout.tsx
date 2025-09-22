@@ -2,14 +2,10 @@ import { SaveHeader } from "@/components/header";
 import { flexCol } from "@/mixin/style";
 
 interface SaveLayoutProps {
-  main: React.ReactNode;
-  sidebar: React.ReactNode;
+  children: React.ReactNode;
 }
 
-export default function SaveLayout({ 
-  main,
-  sidebar, 
-}: SaveLayoutProps) {
+export default function SaveLayout({ children }: SaveLayoutProps) {
   return (
     <div className="bg-[#F5F5F5] min-h-screen">
         <SaveHeader />
@@ -24,9 +20,8 @@ export default function SaveLayout({
                 overflow-y-scroll
             `}
         >
-            {main}
+            {children}
         </main>
-        {sidebar}
     </div>
   );
 }
