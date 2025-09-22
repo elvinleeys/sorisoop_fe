@@ -55,7 +55,7 @@ export default function RegisterForm() {
 
         const payload = {
             placeName,
-            kakaoPlaceId: kakaoPlaceId || null,
+            kakaoPlaceId: kakaoPlaceId || "",
             location: geo,
             categoryCode: categoryCode || null,
             categoryName: categoryName || null,
@@ -78,6 +78,17 @@ export default function RegisterForm() {
                 "등록 완료! 측정 데이터와 한줄평이 저장되었습니다. 저장된 정보를 [저장 탭]에서 확인하세요.",
                 2000
             );
+
+            // ✅ Zustand 초기화
+            useMeasurementStore.getState().cancelMeasurement(); // 측정 데이터 초기화
+            useLocationStore.getState().setLocation({
+                kakaoPlaceId: null,
+                placeName: "위치 검색 중...",
+                location: { type: "Point", coordinates: null },
+                categoryCode: null,
+                categoryName: null,
+            });
+            useReviewStore.getState().reset();
             router.push("/"); // 저장 후 이동
         } catch (err: unknown) {
             if (err instanceof Error) console.error(err.message);
