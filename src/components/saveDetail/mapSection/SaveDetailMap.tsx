@@ -21,7 +21,7 @@ export default function SaveDetailMap({ avgDecibel, lat, lng }: SaveDetailMapPro
 
     return (
         <section className="mb-[0.875rem]">
-            <KakaoMap lat={lat} lng={lng} markers={marker} />
+            <KakaoMap lat={lat} lng={lng} markers={marker}/>
         </section>
     );
 }
