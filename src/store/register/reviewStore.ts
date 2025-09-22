@@ -12,6 +12,7 @@ interface ReviewState {
   submitAttempted: boolean;
   setValue: (val: string) => void;
   setSubmitAttempted: (val: boolean) => void;
+  reset: () => void; // ✅ 추가
 }
 
 export const useReviewStore = create<ReviewState>((set) => ({
@@ -24,4 +25,10 @@ export const useReviewStore = create<ReviewState>((set) => ({
       isValid: isReviewValid(val),
     }),
   setSubmitAttempted: (val) => set({ submitAttempted: val }),
+  reset: () =>
+    set({
+      value: "",
+      isValid: false,
+      submitAttempted: false,
+    }),
 }));
