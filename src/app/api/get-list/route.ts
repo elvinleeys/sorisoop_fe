@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Measurement from "@/model/Measurement";
-import Place from "@/model/Place";
+import Place, { IPlace } from "@/model/Place";
 import { getUserFromToken } from "@/lib/auth";
+import { Types } from "mongoose";
 
 export async function GET(req: NextRequest) {
     await dbConnect();
@@ -20,19 +21,25 @@ export async function GET(req: NextRequest) {
 
     const measurements = await Measurement.find({ userId: user._id })
         .select("avgDecibel maxDecibel measuredAt placeId")
-        .populate({
+        .populate<{ placeId: IPlace }>({
             path: "placeId",      // Measurement에서 참조하는 필드 이름
             select: "placeName",  // Place에서 가져올 필드
             model: Place,       // 선택 사항, ref와 동일하면 생략 가능
-        });
+        })
+        .sort({ measuredAt: -1 })   // ✅ 최신순 정렬
+        .exec();
 
-    const result = measurements.map((m) => ({
-        id: (m._id as string).toString(),
-        avgDecibel: m.avgDecibel,
-        maxDecibel: m.maxDecibel,
-        measuredAt: m.measuredAt,
-        placeName: (m.placeId as any)?.placeName || "알 수 없음",
-    }));
+    const result = measurements.map((m) => {
+        const place = m.placeId as IPlace;
+
+        return {
+            id: (m._id as Types.ObjectId).toString(), // ObjectId → string
+            avgDecibel: m.avgDecibel,
+            maxDecibel: m.maxDecibel,
+            measuredAt: m.measuredAt,
+            placeName: place.placeName,
+        };
+    });
 
     return NextResponse.json(result, { status: 200 });
 }
