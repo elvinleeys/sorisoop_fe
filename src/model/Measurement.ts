@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, { Schema, Document, Model, Types } from "mongoose";
 
 export interface IMeasurement extends Document {
+    _id: Types.ObjectId;
     measuredAt: Date; // 실제 측정 시간
     measuredDate: string; // YYYY-MM-DD 형식
     timeSlot: "5-11" | "11-18" | "18-22"; // 고정 시간대

@@ -1,7 +1,8 @@
-import mongoose, { Document, Model, Schema } from "mongoose";
+import mongoose, { Document, Model, Schema, Types } from "mongoose";
 
 export interface IPlace extends Document {
-  kakaoPlaceId: string;
+  _id: Types.ObjectId;
+  kakaoPlaceId?: string;
   placeName: string;
   location: {
     type: "Point";
@@ -13,11 +14,7 @@ export interface IPlace extends Document {
 
 const PlaceSchema: Schema<IPlace> = new Schema(
   {
-    kakaoPlaceId: {
-      type: String,
-      required: false,
-      default: "", // 이 부분을 추가하여 null 대신 빈 문자열이 저장되도록 합니다.
-    },
+    kakaoPlaceId: { type: String, unique: true, sparse: true },
     placeName: { type: String, required: true },
     location: {
       type: {
