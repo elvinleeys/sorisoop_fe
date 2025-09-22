@@ -16,7 +16,7 @@ export default function KakaoMap({
   lng,
   markers = [],
   height = "10rem",
-  level = 3,
+  level = 5,
 }: KakaoMapProps) {
   const mapRef = useRef<HTMLDivElement | null>(null);
 
