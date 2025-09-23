@@ -6,6 +6,7 @@ import BackModal from "@/components/modal/backModal/BackModal";
 import LogoutModal from "@/components/modal/logoutModal/LogoutModal";
 import DeleteAccountModal from "@/components/modal/deleteAccountModal/DeleteAccountModal";
 import ToastContainer from "@/components/toast/ToastContainer";
+import SideBar from "@/components/sideBar/SideBar";
 
 export const metadata: Metadata = {
   title: 'Soridam Noise Map', // 사이트 기본 제목
@@ -20,11 +21,12 @@ export default function RootLayout({
     <html lang="ko" suppressHydrationWarning>
       <body className="bg-white antialiased">
           <div id="modal" className="relative z-[9999]"></div>
-          <div id="sidebar"></div> 
+          <div id="sidebar" className="relative z-[9999]"></div> 
           <div id="bottom-sheet" className="relative z-[9999]"></div>
           {children}
           <InfoModal />
           <BackModal />
+          <SideBar />
           <LogoutModal />
           <DeleteAccountModal />
           <ToastContainer />
