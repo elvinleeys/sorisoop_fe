@@ -1,8 +1,10 @@
 "use client"
 
+import { useCurrentLocation } from "@/hook/useCurrentLocation";
 import { flexRowCenter } from "@/mixin/style";
-import { useLocationStore } from "@/store/measurement/locationStore";
+import { useMapLocationStore } from "@/store/map/useMapLocationStore";
 import { KakaoPlace } from "@/types/kakaoPlace";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 type searchListProps = {
@@ -16,15 +18,11 @@ export default function SearchList({
     places, 
     setPlaces 
 }: searchListProps) {
-    const { location } = useLocationStore();
-    const { latitude, longitude } = location;
+    const { lat: myLat, lng: myLng } = useCurrentLocation();
+    const router = useRouter();
 
     useEffect(() => {
-        if (!keyword 
-            || keyword.trim() === "" 
-            || latitude === null 
-            || longitude === null
-        ) {
+        if (!keyword || keyword.trim() === "" || myLat === null || myLng === null) {
             setPlaces([]);
             return;
         }
@@ -32,7 +30,7 @@ export default function SearchList({
         const controller = new AbortController(); // 이전 요청 취소용
         const fetchPlaces = async () => {
             try {
-                const res = await fetch(`/api/kakao/search?keyword=${encodeURIComponent(keyword)}&lat=${latitude}&lng=${longitude}`, {
+                const res = await fetch(`/api/kakao/search?keyword=${encodeURIComponent(keyword)}&lat=${myLat}&lng=${myLng}`, {
                     signal: controller.signal,
                 });
 
@@ -57,7 +55,7 @@ export default function SearchList({
         return () => {
             controller.abort(); // 컴포넌트 언마운트 시 요청 취소
         };
-    }, [keyword, latitude, longitude, setPlaces]);
+    }, [keyword, myLat, myLng, setPlaces]);
 
     // place_name에서 keyword와 일치하는 부분을 <span>으로 감싸서 강조
     const highlightKeyword = (text: string, keyword: string) => {
@@ -105,7 +103,10 @@ export default function SearchList({
                     "
                     onClick={() => {
                         console.log("선택한 좌표:", { lat: place.y, lng: place.x });
-                        // 여기에 클릭 시 map 페이지에 좌표 전달 로직 추가 가능
+                        useMapLocationStore
+                            .getState()
+                            .setLocation(Number(place.y), Number(place.x));
+                        router.push("/map");
                     }}
                 >
                     <p 
