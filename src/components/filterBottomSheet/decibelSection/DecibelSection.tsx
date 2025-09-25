@@ -1,12 +1,12 @@
 "use client";
 
 import { flexCol, flexRow, flexRowCenter } from "@/mixin/style";
-import { useFilterStore } from "@/store/filter/FilterStore";
+import { useFilterDataStore } from "@/store/filter/useFilterDataStore";
 import { DecibelButton } from "soridam-design-system";
 import { options } from "./Decibel";
 
 export default function DecibelSection() {
-  const { selectedNoiseLevels, toggleNoiseLevel } = useFilterStore();
+  const { selectedNoiseLevels, toggleNoiseLevel } = useFilterDataStore();
 
   return (
     <div className={`${flexCol} gap-5`}>

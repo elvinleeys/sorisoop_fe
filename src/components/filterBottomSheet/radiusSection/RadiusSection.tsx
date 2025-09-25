@@ -1,16 +1,16 @@
 import { flexCol } from "@/mixin/style";
-import { useFilterStore } from "@/store/filter/FilterStore";
+import { useFilterDataStore } from "@/store/filter/useFilterDataStore";
 import { RadiusButton } from "soridam-design-system";
 
 
 export default function RadiusSection() {
-    const { selectedRadius, selectRadius } = useFilterStore();
+    const { selectedRadius, selectRadius } = useFilterDataStore();
 
-    const options = ["500m이하", "1km이하", "2km이하"];
-    const labelToRadiusMap: Record<string, 500 | 1000 | 2000> = {
+    const options = ["300m이하", "500m이하", "1km이하"];
+    const labelToRadiusMap: Record<string, 300 | 500 | 1000> = {
+        "300m이하": 300,
         "500m이하": 500,
         "1km이하": 1000,
-        "2km이하": 2000,
     };
 
     return (

@@ -1,13 +1,13 @@
 "use client";
 
 import { flexRowBetween } from '@/mixin/style';
-import { useFilterStore } from '@/store/filter/FilterStore';
+import { useFilterUIStore } from '@/store/filter/useFilterUIStore';
 import { useRouter } from 'next/navigation';
 import { FilterButton, SearchBar } from 'soridam-design-system';
 
 export default function MapHeader() {
     const router = useRouter();
-    const { open } = useFilterStore();
+    const { open } = useFilterUIStore();
 
     return(
         <header 

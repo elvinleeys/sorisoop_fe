@@ -4,10 +4,12 @@ import { flexCol, flexRow, flexRowCenter } from "@/mixin/style";
 import Image from "next/image";
 import { CategoryIconButton } from "soridam-design-system";
 import { options, labelToCategoryMap } from "./Category";
-import { useFilterStore } from "@/store/filter/FilterStore";
+import { categoryMap, useFilterDataStore } from "@/store/filter/useFilterDataStore";
+import { useFilterActions } from "@/hook/useFilterAction";
 
 export default function CategorySection() {
-  const { selectedCategories, toggleCategory, closeWithReset } = useFilterStore();
+  const { selectedCategories, toggleCategory } = useFilterDataStore();
+  const { closeWithReset } = useFilterActions();
 
   return (
     <section className={`w-full ${flexCol} gap-[1.375rem]`}>
@@ -30,13 +32,14 @@ export default function CategorySection() {
       <div className={`${flexRow} overflow-x-auto whitespace-nowrap w-full`}>
         <ul className={`${flexRow} items-center gap-2`}>
           {options.map((option) => {
-            const category = labelToCategoryMap[option.label];
+            const category = labelToCategoryMap[option.label]; // "cafe" | "cutlery" ...
+            const categoryCode = categoryMap[category];        // "CE7" | "FD6" ...
             return (
               <li key={option.label} className="inline-block">
                 <CategoryIconButton
                   label={option.label}
                   iconSrc={option.iconSrc}
-                  active={selectedCategories.includes(category)}
+                  active={selectedCategories.includes(categoryCode)}
                   onClick={() => toggleCategory(category)}
                 />
               </li>
