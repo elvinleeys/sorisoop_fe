@@ -10,26 +10,33 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const x = parseFloat(searchParams.get("x") || "0"); // 경도
     const y = parseFloat(searchParams.get("y") || "0"); // 위도
-    const radius = parseInt(searchParams.get("radius") || "500"); // 반경
 
     if (!x || !y) {
       return NextResponse.json({ error: "위도/경도 필요" }, { status: 400 });
     }
 
-    // 주변 장소 조회 (2dsphere 인덱스 필요)
+    // 초기 기본 radius: level 2 기준 200m
+    const radius = 200;
+
+    // 주변 장소 조회
     const nearbyPlaces = await Place.find({
       location: {
         $geoWithin: {
-          $centerSphere: [[x, y], radius / 6371000], // radius: m -> rad (지구 반지름 6371000m)
+          $centerSphere: [[x, y], radius / 6371000], // m -> rad
         },
       },
     }).lean();
 
+    if (nearbyPlaces.length === 0) {
+      return NextResponse.json({ success: true, data: [] });
+    }
+
     const placeIds = nearbyPlaces.map((p) => p._id);
 
-    // 해당 장소의 Measurement 조회
+    // quiet 조건: avgDecibel < 70
     const measurements = await Measurement.find({
       placeId: { $in: placeIds },
+      avgDecibel: { $lt: 70 },
     })
       .select("avgDecibel maxDecibel measuredAt placeId")
       .populate<{ placeId: IPlace }>({
@@ -51,9 +58,9 @@ export async function GET(req: NextRequest) {
       };
     });
 
-    return NextResponse.json(result);
+    return NextResponse.json({ success: true, data: result });
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "데이터 조회 실패" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "데이터 조회 실패" }, { status: 500 });
   }
 }
