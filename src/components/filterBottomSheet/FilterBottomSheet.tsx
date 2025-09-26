@@ -1,15 +1,18 @@
 "use client";
 
-import { useFilterStore } from "@/store/filter/FilterStore";
+import { useFilterUIStore } from "@/store/filter/useFilterUIStore";
 import { BottomSheet, Button } from "soridam-design-system";
 import CategorySection from "./categorySection/CategorySection";
 import DecibelSection from "./decibelSection/DecibelSection";
 import RadiusSection from "./radiusSection/RadiusSection";
 import { flexCol, flexRowCenter } from "@/mixin/style";
 import ClientOnlyPortal from "../clientOnlyPortal/ClientOnlyPortal";
+import { useFilterActions } from "@/hook/useFilterAction";
+import { useFilterDataStore } from "@/store/filter/useFilterDataStore";
 
 export default function FilterBottomSheet() {
-    const { isOpen, closeWithReset } = useFilterStore();
+    const { isOpen, close } = useFilterUIStore();
+    const { closeWithReset } = useFilterActions();
 
     return (
         <ClientOnlyPortal containerId="bottom-sheet">
@@ -41,10 +44,27 @@ export default function FilterBottomSheet() {
                         [box-shadow:-2px_-1px_4px_0_rgba(0,0,0,0.15)]
                     `}
                 >
-                    <Button buttonType="tertiary" size="small" onClick={() => {}}>
+                    <Button 
+                        buttonType="tertiary" 
+                        size="small" 
+                        onClick={() => {
+                            useFilterDataStore.getState().resetFilters();  // 선택값 초기화
+                            useFilterDataStore.getState().clearApplied();
+                            useFilterDataStore.getState().triggerReset();
+                            close();
+                        }}
+                    >
                         초기화
                     </Button>
-                    <Button buttonType="primary" size="small" onClick={() => {}}>
+                    <Button 
+                        buttonType="primary" 
+                        size="small" 
+                        onClick={() => {
+                            useFilterDataStore.getState().applyFilters(); // 필터 적용
+                            useFilterDataStore.getState().triggerReset();
+                            close();
+                        }}
+                    >
                         적용
                     </Button>
                 </footer>
