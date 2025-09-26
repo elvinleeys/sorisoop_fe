@@ -18,12 +18,14 @@ interface FilterDataState {
     selectedNoiseLevels: NoiseLevel[];
     selectedRadius: Radius;
     applied: boolean; // 필터 적용 여부
+    resetTrigger: boolean;
     toggleCategory: (category: Category) => void;
     toggleNoiseLevel: (level: NoiseLevel) => void;
     selectRadius: (radius: Radius) => void;
     resetFilters: () => void;
     applyFilters: () => void; // 적용 버튼 누르면 true로
     clearApplied: () => void; // 초기화 시 false로
+    triggerReset: () => void;
 }
 
 export const useFilterDataStore = create<FilterDataState>((set) => ({
@@ -31,6 +33,7 @@ export const useFilterDataStore = create<FilterDataState>((set) => ({
     selectedNoiseLevels: ["quiet"],
     selectedRadius: 200,
     applied: false,
+    resetTrigger: false,
 
     toggleCategory: (category) =>
         set((state) => {
@@ -63,4 +66,5 @@ export const useFilterDataStore = create<FilterDataState>((set) => ({
         }),
     applyFilters: () => set({ applied: true }),
     clearApplied: () => set({ applied: false }),
+    triggerReset: () => set((state) => ({ resetTrigger: !state.resetTrigger })), // 토글
 }));
