@@ -55,7 +55,7 @@ export default function RegisterForm() {
 
         const payload = {
             placeName,
-            kakaoPlaceId: kakaoPlaceId || "",
+            kakaoPlaceId: kakaoPlaceId ?? null,
             location: geo,
             categoryCode: categoryCode || null,
             categoryName: categoryName || null,

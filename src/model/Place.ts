@@ -14,7 +14,10 @@ export interface IPlace extends Document {
 
 const PlaceSchema: Schema<IPlace> = new Schema(
   {
-    kakaoPlaceId: { type: String, unique: true, sparse: true },
+    kakaoPlaceId: {
+      type: String,
+      default: null, // 값이 없으면 명시적으로 null
+    },
     placeName: { type: String, required: true },
     location: {
       type: {
@@ -42,6 +45,12 @@ const PlaceSchema: Schema<IPlace> = new Schema(
 
 // GeoJSON 인덱스 생성 (위치 기반 검색에 필요)
 PlaceSchema.index({ location: "2dsphere" });
+
+// kakaoPlaceId 가 존재하고 null 이 아닐 때만 unique 검사
+PlaceSchema.index(
+  { kakaoPlaceId: 1 },
+  { unique: true, partialFilterExpression: { kakaoPlaceId: { $type: "string" } } }
+);
 
 const Place: Model<IPlace> =
   mongoose.models.Place || mongoose.model<IPlace>("Place", PlaceSchema);

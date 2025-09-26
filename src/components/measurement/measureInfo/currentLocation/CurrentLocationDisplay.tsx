@@ -38,11 +38,11 @@ export default function CurrentLocationDisplay() {
           const data = await response.json();
 
           setLocation({
-            kakaoPlaceId: data.kakaoPlaceId,
+            kakaoPlaceId: data.kakaoPlaceId || null,
             placeName: data.placeName,
             location: data.location,
-            categoryCode: data.categoryCode,
-            categoryName: data.categoryName,
+            categoryCode: data.categoryCode || null,
+            categoryName: data.categoryName || null,
           });
         } catch (e) {
           console.error(e);

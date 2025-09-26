@@ -13,7 +13,7 @@ type NewPlaceData = {
   };
   categoryCode: "CT1" | "AT4" | "FD6" | "CE7" | "";
   categoryName: "문화시설" | "관광명소" | "음식점" | "카페" | "";
-  kakaoPlaceId?: string;
+  kakaoPlaceId?: string | null;
 };
 
 export async function POST(req: NextRequest) {
@@ -59,29 +59,39 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // kakaoPlaceId가 빈 문자열이면 null 처리
+    const safeKakaoPlaceId = kakaoPlaceId ? kakaoPlaceId : null;
+
     // 1. Place 저장 또는 조회
     let place = null;
 
-    if (kakaoPlaceId) {
-      place = await Place.findOne({ kakaoPlaceId });
+    // 1-1. kakaoPlaceId 기반 조회
+    if (safeKakaoPlaceId) {
+      place = await Place.findOne({ kakaoPlaceId: safeKakaoPlaceId });
     }
 
+    // 1-2. 좌표 + placeName 기반 조회 (좌표 오차 고려)
     if (!place) {
       place = await Place.findOne({
-        "location.coordinates": location.coordinates,
         placeName,
+        location: {
+          $near: {
+            $geometry: location,
+            $maxDistance: 5, // 5m 반경 내
+          },
+        },
       });
     }
 
+    // 1-3. Place가 없으면 새로 생성
     if (!place) {
-      // kakaoPlaceId가 존재할 때만 필드 추가
       const newPlaceData: NewPlaceData = {
         placeName,
         location,
         categoryCode: categoryCode || "",
         categoryName: categoryName || "",
       };
-      if (kakaoPlaceId) newPlaceData.kakaoPlaceId = kakaoPlaceId;
+      if (safeKakaoPlaceId) newPlaceData.kakaoPlaceId = safeKakaoPlaceId;
 
       place = await Place.create(newPlaceData);
     }
