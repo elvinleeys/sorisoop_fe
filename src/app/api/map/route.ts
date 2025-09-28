@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
     const result = measurements.map((m) => {
       const place = m.placeId as IPlace;
       return {
-        id: m._id.toString(),
+        id: m.placeId.toString(),
         lat: place.location.coordinates[1], // 위도
         lng: place.location.coordinates[0], // 경도
         avgDecibel: m.avgDecibel,
