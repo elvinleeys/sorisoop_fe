@@ -3,6 +3,7 @@
 import FilterBottomSheet from "@/components/filterBottomSheet/FilterBottomSheet";
 import { MapHeader } from "@/components/header";
 import MapSection from "@/components/map/mapSection/MapSection";
+import PlaceDetailSheet from "@/components/placeDetailSheet/PlaceDetailSheet";
 import { useMapLocationStore } from "@/store/map/useMapLocationStore";
 
 export default function MapPage() {
@@ -15,6 +16,7 @@ export default function MapPage() {
                 <MapSection centerLat={lat ?? undefined} centerLng={lng ?? undefined} />
             </main>
             <FilterBottomSheet />
+            <PlaceDetailSheet />
         </>
     );
 }
