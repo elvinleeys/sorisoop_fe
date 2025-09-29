@@ -6,24 +6,22 @@ import { BackButton } from "soridam-design-system";
 import { flexCol, flexRow } from "@/mixin/style";
 import { useAuthStore } from "@/store/auth/authStore";
 import Link from "next/link";
-import { useLogoutModalStore } from "@/store/modal/useLogoutModalStore";
-import { useDeleteAccountModalStore } from "@/store/modal/useDeleteAccountModalStore";
+import { useModalStore } from "@/store/modal/useModalStore";
 import ClientOnlyPortal from "../clientOnlyPortal/ClientOnlyPortal";
 
 export default function SideBar() {
     const { isOpen, close: sidebarClose } = useSidebarStore();
     const { accessToken } = useAuthStore();
-    const { open: logoutModalOpen } = useLogoutModalStore();
-    const { open: deleteAccountModalOpen } = useDeleteAccountModalStore();
+    const openModal = useModalStore((s) => s.openModal);
 
     const handleLogoutModal = () => {
         sidebarClose();
-        logoutModalOpen();
+        openModal("logout");
     }
 
     const handleDeleteAccountModal = () => {
         sidebarClose();
-        deleteAccountModalOpen();
+        openModal("deleteAccount");
     }
 
     return(
