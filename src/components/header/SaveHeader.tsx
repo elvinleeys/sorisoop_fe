@@ -1,12 +1,12 @@
 "use client";
 
-import { useInfoModalStore } from "@/store/modal/useInfoModalStore";
+import { useModalStore } from "@/store/modal/useModalStore";
 import { useSidebarStore } from "@/store/sideBar/SideBarStore";
 import { InfoButton, SettingButton } from "soridam-design-system";
 
 export default function SaveHeader() {
-    const { open: infoOpen } = useInfoModalStore();
-    const { open: sbOpen } = useSidebarStore();
+    const openModal = useModalStore((s) => s.openModal);
+    const { open } = useSidebarStore();
 
     return (
         <header 
@@ -22,8 +22,8 @@ export default function SaveHeader() {
                 gap-[0.875rem]
             "
         >
-            <InfoButton size="md" onClick={infoOpen}/>
-            <SettingButton size="md" onClick={sbOpen} />
+            <InfoButton size="md" onClick={() => openModal("info")}/>
+            <SettingButton size="md" onClick={open} />
         </header>
     );
 }

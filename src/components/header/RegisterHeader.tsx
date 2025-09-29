@@ -1,11 +1,11 @@
 "use client";
 
 import { flexRowCenter } from "@/mixin/style";
-import { useBackModalStore } from "@/store/modal/useBackModalStore";
+import { useModalStore } from "@/store/modal/useModalStore";
 import { BackButton } from "soridam-design-system";
 
 export default function RegisterHeader() {
-    const { open } = useBackModalStore();
+    const openModal = useModalStore((s) => s.openModal);
 
     return (
         <header 
@@ -17,7 +17,7 @@ export default function RegisterHeader() {
             "
         >
             <div className={`${flexRowCenter} w-[3rem] h-[3rem]`}>
-                <BackButton onClick={open} size="md"/>
+                <BackButton onClick={() => openModal("back")} size="md"/>
             </div>
         </header>
     );

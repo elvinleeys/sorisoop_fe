@@ -1,13 +1,13 @@
 "use client";
 
 import { flexRowBetween, flexRowCenter } from "@/mixin/style";
-import { useDeleteModalStore } from "@/store/modal/useDeleteModalStore";
+import { useModalStore } from "@/store/modal/useModalStore";
 import { useRouter } from "next/navigation";
 import { BackButton } from "soridam-design-system";
 
 export default function SaveDetailHeader() {
     const router = useRouter();
-    const { open } = useDeleteModalStore();
+    const openModal = useModalStore((s) => s.openModal);
 
     return (
         <header 
@@ -25,7 +25,7 @@ export default function SaveDetailHeader() {
             </div>
             <button 
                 type="button"
-                onClick={open} 
+                onClick={() => openModal("delete")} 
                 className="bg-white border-none"
             >
                 <p className="text-base leading-4 text-[#D32F2F]">
