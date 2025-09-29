@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import 'soridam-design-system/styles';
-import InfoModal from "@/components/modal/infoModal/InfoModal";
-import BackModal from "@/components/modal/backModal/BackModal";
-import LogoutModal from "@/components/modal/logoutModal/LogoutModal";
-import DeleteAccountModal from "@/components/modal/deleteAccountModal/DeleteAccountModal";
 import ToastContainer from "@/components/toast/ToastContainer";
 import SideBar from "@/components/sideBar/SideBar";
+import UnifiedModalRenderer from "@/components/modal/UnifiedModalRenderer";
 
 export const metadata: Metadata = {
   title: 'Soridam Noise Map', // 사이트 기본 제목
@@ -24,11 +21,8 @@ export default function RootLayout({
           <div id="sidebar" className="relative z-[9999]"></div> 
           <div id="bottom-sheet" className="relative z-[9999]"></div>
           {children}
-          <InfoModal />
-          <BackModal />
+          <UnifiedModalRenderer />
           <SideBar />
-          <LogoutModal />
-          <DeleteAccountModal />
           <ToastContainer />
       </body>
     </html>
