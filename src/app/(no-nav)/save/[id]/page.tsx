@@ -1,6 +1,5 @@
 "use client";
 
-import DeleteModal from "@/components/modal/deleteModal/DeleteModal";
 import SaveDetailMap from "@/components/saveDetail/mapSection/SaveDetailMap";
 import ResultDetail from "@/components/saveDetail/resultDetail/ResultDetail";
 import { fetchWrapper } from "@/lib/fetchWrapper";
@@ -70,7 +69,6 @@ export default function SaveDetail() {
                 measuredAt={data.measuredAt}
                 comment={data.comment}
             />
-            <DeleteModal listId={listId} />
         </>
     );
 }
