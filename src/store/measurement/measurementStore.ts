@@ -41,8 +41,12 @@ export const useMeasurementStore = create<MeasurementStoreState>((set) => ({
     set((state) => {
       const history = [...state.decibelHistory, decibel];
       const maxDecibel = Math.max(...history);
+      // 이동 평균 적용
+      const alpha = 0.2;
       const avgDecibel =
-        history.reduce((a, b) => a + b, 0) / history.length;
+        state.avgDecibel === 0
+          ? decibel
+          : alpha * decibel + (1 - alpha) * state.avgDecibel;
 
       return { decibelHistory: history, maxDecibel, avgDecibel };
     }),
