@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import NavBar from '@/components/nav/NavBar';
-import PageTransition from '@/components/pageTransition/PageTransition';
+import PageTransition from '@/components/animate/pageTransition/PageTransition';
 
 interface MainLayoutProps {
   children: ReactNode;

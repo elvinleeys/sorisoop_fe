@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import PageTransition from '@/components/pageTransition/PageTransition';
+import PageTransition from '@/components/animate/pageTransition/PageTransition';
 
 interface NoNavLayoutProps {
   children: ReactNode;
