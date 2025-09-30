@@ -17,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className="bg-white antialiased">
-          <div id="modal" className="relative z-[9999]"></div>
+          <div id="modal"></div>
           <div id="sidebar" className="relative z-[9999]"></div> 
           <div id="bottom-sheet" className="relative z-[9999]"></div>
           {children}
