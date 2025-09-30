@@ -1,14 +1,14 @@
 import { create } from "zustand";
 
-type CategoryCode = "CT1" | "AT4" | "FD6" | "CE7" | "";
-type CategoryName = "문화시설" | "관광명소" | "음식점" | "카페" | "";
+type CategoryCode = "CT1" | "AT4" | "FD6" | "CE7" | "" | string;
+type CategoryName = "문화시설" | "관광명소" | "음식점" | "카페" | "" | string;
 
 interface GeoPoint {
   type: "Point";
   coordinates: [number, number] | null;
 }
 
-interface LocationState {
+export interface LocationState {
   kakaoPlaceId: string | null;
   placeName: string | null;
   location: GeoPoint;
