@@ -1,3 +1,4 @@
+import { LocationResponse } from '@/types/dto/Location';
 import { NextRequest, NextResponse } from 'next/server';
 
 type CategoryMap = {
@@ -47,7 +48,7 @@ export async function GET(request: NextRequest) {
 
       const categoryInfo = categoryMapping[place.category_group_name] || { code: null, name: null };
 
-      return NextResponse.json({
+      return NextResponse.json<LocationResponse>({
         kakaoPlaceId: place.id,
         placeName: place.place_name,
         location: {
@@ -80,7 +81,7 @@ export async function GET(request: NextRequest) {
           ? jibunFull.split(" ").slice(-2).join(" ") 
           : "위치 정보 없음";
 
-      return NextResponse.json({
+      return NextResponse.json<LocationResponse>({
         kakaoPlaceId: null,
         placeName: simplifiedAddress,
         location: {
@@ -92,7 +93,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({
+    return NextResponse.json<LocationResponse>({
       kakaoPlaceId: null,
       placeName: "위치 정보 없음",
       location: {
