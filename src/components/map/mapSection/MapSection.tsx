@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { useCurrentLocation } from "@/hook/useCurrentLocation";
 import KakaoMap from "@/components/kakaoMap/KakaoMap";
-import { getMarkerImg } from "@/util/getMarkerImg";
 import { useFilterDataStore } from "@/store/filter/useFilterDataStore";
 import { useMapLocationStore } from "@/store/map/useMapLocationStore";
+import { getMarkerImg } from "@/util/getDecibelLevel";
 
 interface NoiseData {
   id: string;
