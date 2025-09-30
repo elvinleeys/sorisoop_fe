@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEffect } from "react";
 import { useLocationStore } from "@/store/measurement/locationStore";
 import { useCurrentLocation } from "@/hook/useCurrentLocation";
+import { fetchLocation } from "@/services/measurement/fetchLocation";
 
 export default function CurrentLocationDisplay() {
   // store에서 location 상태와 setLocation 함수 가져오기
@@ -15,8 +16,7 @@ export default function CurrentLocationDisplay() {
   const { lat, lng, error } = useCurrentLocation();
 
   useEffect(() => {
-    // 이미 값이 있다면 다시 호출 안 함
-    if (location.placeName && location.placeName !== "위치 검색 중...") return;
+    if (!lat || !lng) return;
 
     if (error) {
       setLocation({
@@ -29,34 +29,29 @@ export default function CurrentLocationDisplay() {
       return;
     }
 
-    if (lat && lng) {
-      (async () => {
-        try {
-          const response = await fetch(`/api/location?x=${lng}&y=${lat}`);
-          if (!response.ok) throw new Error("서버에서 위치 정보 가져오기 실패");
+    (async () => {
+      try {
+        const data = await fetchLocation(lat, lng);
 
-          const data = await response.json();
-
-          setLocation({
-            kakaoPlaceId: data.kakaoPlaceId || null,
-            placeName: data.placeName,
-            location: data.location,
-            categoryCode: data.categoryCode || null,
-            categoryName: data.categoryName || null,
-          });
-        } catch (e) {
-          console.error(e);
-          setLocation({
-            kakaoPlaceId: null,
-            placeName: "위치 가져오기 실패",
-            location: { type: "Point", coordinates: null },
-            categoryCode: null,
-            categoryName: null,
-          });
-        }
-      })();
-    }
-  }, [lat, lng, error, location.placeName, setLocation]);
+        setLocation({
+          kakaoPlaceId: data.kakaoPlaceId ?? null,
+          placeName: data.placeName,
+          location: data.location,
+          categoryCode: data.categoryCode ?? null,
+          categoryName: data.categoryName ?? null,
+        });
+      } catch (e) {
+        console.error(e);
+        setLocation({
+          kakaoPlaceId: null,
+          placeName: "위치 가져오기 실패",
+          location: { type: "Point", coordinates: null },
+          categoryCode: null,
+          categoryName: null,
+        });
+      }
+    })();
+  }, [lat, lng, error, setLocation]);
 
   return (
     <div
