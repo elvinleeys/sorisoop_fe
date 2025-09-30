@@ -1,17 +1,9 @@
 "use client";
 
 import { useMeasurementStore } from "@/store/measurement/measurementStore";
+import { getDecibelLevel } from "@/util/getDecibelLevel";
 import { motion, AnimatePresence } from "framer-motion";
 import { MeasureDecibelLabel } from "soridam-design-system";
-
-// 데시벨 값에 따라 레벨을 결정하는 함수
-const getDecibelLevel = (db: number, status: string) => {
-  if (status === "idle") return "default";
-  if (db <= 70) return "quiet";
-  if (db > 70 && db < 100) return "moderate";
-  if (db >= 100) return "loud";
-  return "default";
-};
 
 const labelVariants = {
   initial: { opacity: 0, scale: 0.5 },
@@ -19,7 +11,7 @@ const labelVariants = {
   exit: { opacity: 0, scale: 0.5, transition: { duration: 0.3 } },
 };
 
-export default function MaxDecibel() {
+export default function DecibelLevel() {
     const { avgDecibel, status } = useMeasurementStore();
 
     // store에서 이미 관리되는 avgDecibel 사용
