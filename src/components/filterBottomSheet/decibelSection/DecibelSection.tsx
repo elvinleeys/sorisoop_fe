@@ -6,7 +6,7 @@ import { DecibelButton } from "soridam-design-system";
 import { options } from "./Decibel";
 
 export default function DecibelSection() {
-  const { selectedNoiseLevels, toggleNoiseLevel } = useFilterDataStore();
+  const { tempNoiseLevels, toggleNoiseLevel } = useFilterDataStore();
 
   return (
     <div className={`${flexCol} gap-5`}>
@@ -26,7 +26,7 @@ export default function DecibelSection() {
             <DecibelButton
               label={option.label}
               level={option.decibelLv}
-              active={selectedNoiseLevels.includes(option.decibelLv)}
+              active={tempNoiseLevels.includes(option.decibelLv)}
               onClick={() => toggleNoiseLevel(option.decibelLv)}
             />
             {index === 0 && (

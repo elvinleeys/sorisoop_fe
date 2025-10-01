@@ -5,11 +5,9 @@ import Image from "next/image";
 import { CategoryIconButton } from "soridam-design-system";
 import { options, labelToCategoryMap } from "./Category";
 import { categoryMap, useFilterDataStore } from "@/store/filter/useFilterDataStore";
-import { useFilterActions } from "@/hook/useFilterAction";
 
-export default function CategorySection() {
-  const { selectedCategories, toggleCategory } = useFilterDataStore();
-  const { closeWithReset } = useFilterActions();
+export default function CategorySection({onClose}: {onClose: () => void}) {
+  const { tempCategories, toggleCategory } = useFilterDataStore();
 
   return (
     <section className={`w-full ${flexCol} gap-[1.375rem]`}>
@@ -23,7 +21,7 @@ export default function CategorySection() {
             중복선택 가능
           </p>
         </div>
-        <button onClick={closeWithReset} className="w-8 h-8 relative">
+        <button onClick={onClose} className="w-8 h-8 relative">
           <Image src="/icons/filter/close.svg" alt="close button" fill />
         </button>
       </div>
@@ -39,7 +37,7 @@ export default function CategorySection() {
                 <CategoryIconButton
                   label={option.label}
                   iconSrc={option.iconSrc}
-                  active={selectedCategories.includes(categoryCode)}
+                  active={tempCategories.includes(categoryCode)}
                   onClick={() => toggleCategory(category)}
                 />
               </li>

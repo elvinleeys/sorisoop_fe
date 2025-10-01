@@ -4,7 +4,7 @@ import { RadiusButton } from "soridam-design-system";
 
 
 export default function RadiusSection() {
-    const { selectedRadius, selectRadius } = useFilterDataStore();
+    const { tempRadius, selectRadius } = useFilterDataStore();
 
     const options = ["300m이하", "500m이하", "1km이하"];
     const labelToRadiusMap: Record<string, 300 | 500 | 1000> = {
@@ -37,7 +37,7 @@ export default function RadiusSection() {
                         <li key={option}>
                             <RadiusButton
                                 label={option}
-                                active={selectedRadius === radiusValue}
+                                active={tempRadius === radiusValue}
                                 onClick={() => selectRadius(radiusValue)}
                             />
                         </li>

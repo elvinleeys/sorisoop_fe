@@ -7,16 +7,36 @@ import DecibelSection from "./decibelSection/DecibelSection";
 import RadiusSection from "./radiusSection/RadiusSection";
 import { flexCol, flexRowCenter } from "@/mixin/style";
 import ClientOnlyPortal from "../clientOnlyPortal/ClientOnlyPortal";
-import { useFilterActions } from "@/hook/useFilterAction";
 import { useFilterDataStore } from "@/store/filter/useFilterDataStore";
 
 export default function FilterBottomSheet() {
     const { isOpen, close } = useFilterUIStore();
-    const { closeWithReset } = useFilterActions();
+    const { 
+        applyFilters, 
+        resetFilters, 
+        discardFilters, 
+        triggerReset 
+    } = useFilterDataStore();
+
+    const handleClose = () => {
+        discardFilters(); // 임시 선택값 무시하고 applied 값으로 복원
+        close();
+    };
+
+    const handleApply = () => {
+        applyFilters();
+        triggerReset();
+        close();
+    };
+
+    const handleReset = () => {
+        resetFilters();
+        close();
+    };
 
     return (
         <ClientOnlyPortal containerId="bottom-sheet">
-            <BottomSheet isOpen={isOpen} onClose={closeWithReset}>
+            <BottomSheet isOpen={isOpen} onClose={handleClose}>
                 <main 
                     className={`
                         ${flexCol}
@@ -27,7 +47,7 @@ export default function FilterBottomSheet() {
                         px-[1rem]
                     `}
                 >
-                    <CategorySection />
+                    <CategorySection onClose={handleClose}/>
                     <DecibelSection />
                     <RadiusSection />
                 </main>
@@ -47,23 +67,14 @@ export default function FilterBottomSheet() {
                     <Button 
                         buttonType="tertiary" 
                         size="small" 
-                        onClick={() => {
-                            useFilterDataStore.getState().resetFilters();  // 선택값 초기화
-                            useFilterDataStore.getState().clearApplied();
-                            useFilterDataStore.getState().triggerReset();
-                            close();
-                        }}
+                        onClick={handleReset}
                     >
                         초기화
                     </Button>
                     <Button 
                         buttonType="primary" 
                         size="small" 
-                        onClick={() => {
-                            useFilterDataStore.getState().applyFilters(); // 필터 적용
-                            useFilterDataStore.getState().triggerReset();
-                            close();
-                        }}
+                        onClick={handleApply}
                     >
                         적용
                     </Button>
