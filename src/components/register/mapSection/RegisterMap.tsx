@@ -3,17 +3,9 @@
 import KakaoMap from "@/components/kakaoMap/KakaoMap";
 import { useLocationStore } from "@/store/measurement/locationStore";
 import { useMeasurementStore } from "@/store/measurement/measurementStore";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-
-const getDecibelImg = (db: number) => {
-    if (db <= 70) return "/icons/quiet.svg";
-    if (db > 70 && db < 100) return "/icons/moderate.svg";
-    return "/icons/loud.svg";
-};
+import { getMarkerImg } from "@/util/getDecibelLevel";
 
 export default function RegisterMap() {
-    const router = useRouter();
     const { avgDecibel } = useMeasurementStore();
     const { location } = useLocationStore();
     // GeoJSON coordinates: [longitude, latitude]
@@ -21,18 +13,7 @@ export default function RegisterMap() {
     const lat = coordinates?.[1];
     const lng = coordinates?.[0];
 
-    // ✅ 위치 정보 없으면 redirect
-    useEffect(() => {
-        if (!lat || !lng) {
-            router.replace("/"); // 원래 측정 페이지
-        }
-    }, [lat, lng, router]);
-
-    if (!lat || !lng) {
-        return null; // redirect 중이므로 UI 렌더링 방지
-    }
-
-    const imgSrc = getDecibelImg(avgDecibel);
+    const imgSrc = getMarkerImg(avgDecibel);
     const marker = lat && lng
     ? [{ lat, lng, image: imgSrc }]
     : [];
@@ -40,8 +21,8 @@ export default function RegisterMap() {
     return (
         <section className="mb-[0.875rem]">
             <KakaoMap
-                lat={lat}
-                lng={lng}
+                lat={lat!}
+                lng={lng!}
                 markers={marker}
                 level={1}
                 draggable={true}
