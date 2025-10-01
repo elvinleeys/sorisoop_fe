@@ -5,6 +5,7 @@ import { Button, Modal } from "soridam-design-system";
 import { flexColCenter, flexRowCenter } from "@/mixin/style";
 import { useMeasurementStore } from "@/store/measurement/measurementStore";
 import { useRouter } from "next/navigation";
+import { useReviewStore } from "@/store/register/reviewStore";
 
 interface BackModalProps {
   isOpen: boolean;
@@ -16,10 +17,12 @@ export default function BackModal({
     onClose
 } : BackModalProps) {
     const cancelMeasurement = useMeasurementStore((state) => state.cancelMeasurement);
+    const { reset } = useReviewStore();
     const router = useRouter();
 
     const handleGoBack = () => {
         cancelMeasurement(); // 데이터 초기화
+        reset();             // 한줄평 초기화
         onClose();             // 모달 닫기
         router.push("/");    // 메인 페이지로 이동
     };
