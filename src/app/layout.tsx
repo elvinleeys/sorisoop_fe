@@ -19,7 +19,6 @@ export default function RootLayout({
       <body className="bg-white antialiased">
           <div id="modal"></div>
           <div id="sidebar" className="relative z-[9999]"></div> 
-          <div id="bottom-sheet" className="relative z-[9999]"></div>
           {children}
           <UnifiedModalRenderer />
           <SideBar />

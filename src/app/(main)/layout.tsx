@@ -12,10 +12,8 @@ export default function MainLayout({ children } : MainLayoutProps) {
             <PageTransition>
                 {children}
             </PageTransition>
-            <div 
-                id="place-detail" 
-                className="fixed inset-x-0 bottom-[6.25rem] z-[9991]"
-            ></div>
+            <div id="place-detail"></div>
+            <div id="bottom-sheet"></div>
             <NavBar />        
         </>
     );
