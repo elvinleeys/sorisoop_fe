@@ -7,6 +7,8 @@ import { formatDateTime } from "@/util/formatDateTime";
 import ClientOnlyPortal from "../clientOnlyPortal/ClientOnlyPortal";
 import { flexCol, flexRowCenter } from "@/mixin/style";
 import { useEffect, useState } from "react";
+import { fetchPlaceDetail } from "@/services/map/fetchPlaceDetail";
+import { getDecibelLevel } from "@/util/getDecibelLevel";
 
 interface PlaceDetailResponse {
   placeName: string;
@@ -21,12 +23,6 @@ function getCurrentRange(): "5-11" | "11-18" | "18-22" {
   return "18-22";
 }
 
-function mapDecibelToLevel(avgDecibel: number): "quiet" | "moderate" | "loud" {
-  if (avgDecibel < 70) return "quiet";
-  if (avgDecibel < 100) return "moderate";
-  return "loud";
-}
-
 export default function PlaceDetailSheet() {
     const { isOpen, closeSheet, selectedMarker } = useBottomSheetStore();
     const [data, setData] = useState<PlaceDetailResponse | null>(null);
@@ -36,48 +32,32 @@ export default function PlaceDetailSheet() {
     const Newtime = new Date();
     const { date, time } = formatDateTime(Newtime);
 
-    // ✅ 현재 시간대
     const currentRange = getCurrentRange();
 
-    // ✅ 마커 클릭 시 데이터 가져오기
     useEffect(() => {
         if (!isOpen || !selectedMarker) return;
 
-        const fetchData = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                // ❌ 기존: ?date=... → 제거 (누적 데이터 기반 API 사용)
-                const res = await fetch(`/api/map/place-detail/${selectedMarker.id}`);
+        setLoading(true);
+        setError(null);
 
-                if (!res.ok) throw new Error("데이터 불러오기 실패");
-                const json = await res.json();
-                if (!json.success) throw new Error("API 실패");
-
-                setData(json.data);
-            } catch (e: any) {
-                console.error("PlaceDetail API error:", e);
-                setError(e.message);
-                setData(null);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
+        fetchPlaceDetail(selectedMarker.id)
+        .then(setData)
+        .catch((e) => {
+            console.error(e);
+            setError(e.message);
+            setData(null);
+        })
+        .finally(() => setLoading(false));
     }, [isOpen, selectedMarker]);
 
-    // ✅ chart & reviews 안전 처리
     const chartData = data?.chart ?? [];
-    const reviews =
-        data?.comments.map((c, idx) => ({ id: idx, text: c })) ?? [];
-    
-    // ✅ 현재 시간대의 평균 dB 가져오기
+    const reviews = data?.comments.map((c, idx) => ({ id: idx, text: c })) ?? [];
+
     const currentSlot = chartData.find((c) => c.timeRange === currentRange);
     const avgDecibel = currentSlot?.db ?? 0;
 
-    // ✅ 수준 계산
-    const decibelLevel = mapDecibelToLevel(avgDecibel);
+    // ✅ util 함수 사용
+    const decibelLevel = getDecibelLevel(avgDecibel);
 
     return (
         <ClientOnlyPortal containerId="place-detail">
@@ -87,9 +67,17 @@ export default function PlaceDetailSheet() {
                 title="장소 상세보기"
             >
                 <section className={`${flexCol} max-h-full min-h-0`}>
-                    {loading ? (
-                        <p className="p-4 text-center">불러오는 중...</p>
-                    ) : data ? (
+                    {loading && (
+                        <p className="p-4 text-center">
+                            불러오는 중...
+                        </p>
+                    )}
+                    {error && (
+                        <p className="p-4 text-center text-red-500">
+                            {error}
+                        </p>
+                    )}
+                    {!loading && data && (
                         <>
                             <LocationInfo
                                 placeName={data.placeName}
@@ -98,59 +86,30 @@ export default function PlaceDetailSheet() {
                                 decibelLevel={decibelLevel}
                             />
                             <article className={`${flexRowCenter} w-full my-5`}>
-                                <TimeDBChart
-                                    data={chartData}
-                                    currentRange={currentRange}
-                                />
+                                <TimeDBChart data={chartData} currentRange={currentRange} />
                             </article>
                             <article className="flex-1 min-h-0 flex flex-col">
-                                <h4
-                                    className="
-                                        mb-3
-                                        text-base 
-                                        !font-bold 
-                                        text-neutral-black
-                                    "
-                                >
-                                    한줄평
-                                </h4>
-                                <div
-                                    className={`
-                                        flex-1
-                                        overflow-y-auto 
-                                        pr-2
-                                        transition-all duration-300
-                                    `}
-                                >
+                                <h4 className="mb-3 text-base !font-bold text-neutral-black">한줄평</h4>
+                                <div className="flex-1 overflow-y-auto pr-2 transition-all duration-300">
                                 {reviews.length > 0 ? (
                                     <ul className="space-y-3 pb-16">
-                                        {reviews.map((r) => (
-                                            <li
-                                                key={r.id}
-                                                className="
-                                                    w-full
-                                                    p-2.5
-                                                    rounded-[0.42rem]
-                                                    bg-neutral-gray-bg
-                                                    border border-neutral-gray-soft
-                                                    text-base
-                                                    text-neutral-black
-                                                "
-                                            >
-                                                {r.text}
-                                            </li>
-                                        ))}
+                                    {reviews.map((r) => (
+                                        <li
+                                        key={r.id}
+                                        className="w-full p-2.5 rounded-[0.42rem] bg-neutral-gray-bg border border-neutral-gray-soft text-base text-neutral-black"
+                                        >
+                                        {r.text}
+                                        </li>
+                                    ))}
                                     </ul>
                                 ) : (
                                     <p className="text-neutral-gray-dark text-sm">
-                                        아직 등록된 한줄평이 없습니다.
+                                    아직 등록된 한줄평이 없습니다.
                                     </p>
-                            )}
-                            </div>
-                        </article>
+                                )}
+                                </div>
+                            </article>
                         </>
-                    ) : (
-                        <p className="p-4 text-center">데이터가 없습니다.</p>
                     )}
                 </section>
             </ExpandBottomSheet>

@@ -12,3 +12,12 @@
 - chart의 경과시간 관련 로직을 timer hook으로 분리함으로써 UI랜더링과 상태관리 책임 분리
 - Fade animation 관련 FadeInUp 컴포넌트로 구현
 - 소음 측정 화면의 상태별 button 구성정보를 object로 관리
+
+## 2025.10.01
+- 소음 측정 데이터가 들어오지 않을시 main 페이지로 redirect하는 useEnsureMeasurement 구현하여 RegisterMap과 RegisterForm에서 반복적으로 데이터가 없을시 redirection하는 함수를 제거하고 페이지에서 통합 관리
+- 측정 시 사용되는 함수와 여러 경로(/map, /register)에서 avgDecibel로부터 level이나 img경로를 가져오는 함수가 반복됨에따라 overloading으로 변경
+-  filter의 option data를 관리하는 store에 temp 도입
+- /map의 MapHeader에서 /map/search로 이동하는 페이지 전환을 보다 빠르게 하기 위해 prefetch도입
+- 초기 지도 랜더링시 사용하는 /api/map과 필터적용시 사용되는 /api/map/with-measurement를 통합
+- /map/search의 입력시마다 과도한 fetching을 막기 위해 debounce 도입
+- /search, placeDetailSheet, /map 관련 fetch함수 모듈화 및 response dto 설정
