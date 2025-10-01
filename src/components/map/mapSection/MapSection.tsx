@@ -6,15 +6,7 @@ import KakaoMap from "@/components/kakaoMap/KakaoMap";
 import { useFilterDataStore } from "@/store/filter/useFilterDataStore";
 import { useMapLocationStore } from "@/store/map/useMapLocationStore";
 import { getMarkerImg } from "@/util/getDecibelLevel";
-
-interface NoiseData {
-  id: string;
-  lat: number;
-  lng: number;
-  avgDecibel: number;
-  maxDecibel: number;
-  placeName: string;
-}
+import { fetchNoiseMarkers } from "@/services/map/fetchNoiseMarker";
 
 interface NoiseMarker {
   id: string;
@@ -40,11 +32,10 @@ export default function MapSection() {
   const [center, setCenter] = 
     useState<{ lat: number; lng: number } | null>(null);
   const [effectiveRadius, setEffectiveRadius] = useState<number>(2);
-  const { 
-    selectedCategories, 
-    selectedNoiseLevels, 
-    selectedRadius, 
-    applied,
+  const {
+    appliedCategories,
+    appliedNoiseLevels,
+    appliedRadius,
     resetTrigger,
   } = useFilterDataStore();
 
@@ -55,63 +46,42 @@ export default function MapSection() {
     else if (myLat != null && myLng != null) setCenter({ lat: myLat, lng: myLng });
   }, [storeLat, storeLng, myLat, myLng]);
 
+  // 마커 데이터 fetch
   useEffect(() => {
     if (!center) return;
     const controller = new AbortController();
 
-    const store = useFilterDataStore.getState();
-    console.log("Fetch store values", store);
     const fetchMarkers = async () => {
       try {
-        let url = "";
+        const data = await fetchNoiseMarkers({
+          center,
+          radius: appliedRadius,
+          categories: appliedCategories,
+          noiseLevels: appliedNoiseLevels,
+          signal: controller.signal,
+        });
 
-        if (applied) {
-          const params = new URLSearchParams({
-            x: String(center.lng),
-            y: String(center.lat),
-            radius: String(selectedRadius),
-          });
-
-          // 카테고리 추가
-          selectedCategories.forEach((c) => params.append("categories", c));
-
-          // 소음 레벨 추가
-          selectedNoiseLevels.forEach((n) => params.append("noiseLevels", n));
-
-          url = `/api/map/with-measurement?${params.toString()}`;
-        } else {
-          url = `/api/map?x=${center.lng}&y=${center.lat}&radius=200`;
-        }
-        console.log("url: ", url);
-        const res = await fetch(url, { signal: controller.signal });
-        if (!res.ok) throw new Error("데이터 불러오기 실패");
-        const json = await res.json();
-        if (!json.success) throw new Error("API 실패");
-        console.log("API url:", url);
-        console.log("HTTP status:", res.status);
-        console.log("API response:", json);
-
-        const formattedMarkers = json.data.map((d: any) => ({
-          id: d.id,
-          lat: d.lat,
-          lng: d.lng,
-          avgDecibel: d.avgDecibel ?? null,
-          image: getMarkerImg(d.avgDecibel),
+        // avgDecibel → marker image 매핑
+        const mapped = data.map((d) => ({
+          ...d,
+          image: getMarkerImg(d.avgDecibel ?? null),
         }));
-        console.log("Formatted markers:", formattedMarkers);
-        setMarkers(formattedMarkers);
 
-        // ✅ 여기서 항상 effectiveRadius를 업데이트
-      setEffectiveRadius(applied ? getMapLevel(selectedRadius) : getMapLevel(200));
-      } catch (e: any) {
-        if (e.name === "AbortError") return;
-        console.error("Marker fetch failed:", e);
+        setMarkers(mapped);
+        setEffectiveRadius(getMapLevel(appliedRadius));
+      } catch (e: unknown) {
+        if (e instanceof DOMException && e.name === "AbortError") return;
+        if (e instanceof Error) {
+          console.error("Marker fetch failed:", e.message);
+        } else {
+          console.error("Marker fetch failed:", e);
+        }
       }
     };
 
     fetchMarkers();
     return () => controller.abort();
-  }, [center, applied, resetTrigger]);
+  }, [center, appliedCategories, appliedNoiseLevels, appliedRadius, resetTrigger]);
 
   if (error) return <div>위치 오류: {error}</div>;
   if (!center) return <div>위치 불러오는 중...</div>;
