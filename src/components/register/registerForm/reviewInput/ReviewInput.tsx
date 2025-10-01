@@ -9,26 +9,36 @@ interface ReviewInputProps {
     isSubmitting: boolean;
 }
 
-export default function ReviewInput({ onSubmit, isSubmitting }: ReviewInputProps) {
+export default function ReviewInput({ 
+    onSubmit, 
+    isSubmitting 
+}: ReviewInputProps) {
+
     const { 
         value, 
         setValue, 
         submitAttempted, 
-        setSubmitAttempted 
+        setSubmitAttempted, 
+        isValid 
     } = useReviewStore();
+
 
     return (
         <>
             <div className="mb-[4.0625rem]">
                 <OneLineReviewInput
-                value={value}
-                onChange={(val) => setValue(val)}
-                maxLength={150}
-                submitAttempted={submitAttempted}
-                onFocus={() => setSubmitAttempted(false)}
+                    value={value}
+                    onChange={(val) => setValue(val)}
+                    maxLength={150}
+                    submitAttempted={submitAttempted}
+                    onFocus={() => setSubmitAttempted(false)}
                 />
             </div>
-            <ReviewButton onSubmit={onSubmit} isSubmitting={isSubmitting}/>
+            <ReviewButton 
+                onSubmit={onSubmit} 
+                isSubmitting={isSubmitting} 
+                isValid={isValid}
+            />
         </>
     );
 }
