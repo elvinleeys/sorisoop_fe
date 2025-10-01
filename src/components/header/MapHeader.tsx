@@ -3,11 +3,17 @@
 import { flexRowBetween } from '@/mixin/style';
 import { useFilterUIStore } from '@/store/filter/useFilterUIStore';
 import { useRouter } from 'next/navigation';
+import { memo, useEffect } from 'react';
 import { FilterButton, SearchBar } from 'soridam-design-system';
 
-export default function MapHeader() {
+function MapHeaderComponent() {
     const router = useRouter();
     const { open } = useFilterUIStore();
+
+    // 사전 Prefetch
+    useEffect(() => {
+        router.prefetch("/map/search");
+    }, [router]);
 
     return(
         <header 
@@ -25,3 +31,5 @@ export default function MapHeader() {
         </header>
     );
 }
+
+export default memo(MapHeaderComponent);
