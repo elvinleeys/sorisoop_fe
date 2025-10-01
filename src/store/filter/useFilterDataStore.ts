@@ -3,68 +3,101 @@ import { create } from "zustand";
 export type NoiseLevel = "quiet" | "moderate" | "loud";
 export type Radius = 200 | 300 | 500 | 1000;
 export type Category = "cafe" | "cutlery" | "culture" | "tour";
-
 export type CategoryCode = "CE7" | "FD6" | "CT1" | "AT4";
 
 export const categoryMap: Record<Category, CategoryCode> = {
-    cafe: "CE7",      // 카페
-    cutlery: "FD6",   // 음식점
-    culture: "CT1",   // 문화시설
-    tour: "AT4",      // 관광명소
+  cafe: "CE7",
+  cutlery: "FD6",
+  culture: "CT1",
+  tour: "AT4",
 };
 
 interface FilterDataState {
-    selectedCategories: CategoryCode[];
-    selectedNoiseLevels: NoiseLevel[];
-    selectedRadius: Radius;
-    applied: boolean; // 필터 적용 여부
-    resetTrigger: boolean;
-    toggleCategory: (category: Category) => void;
-    toggleNoiseLevel: (level: NoiseLevel) => void;
-    selectRadius: (radius: Radius) => void;
-    resetFilters: () => void;
-    applyFilters: () => void; // 적용 버튼 누르면 true로
-    clearApplied: () => void; // 초기화 시 false로
-    triggerReset: () => void;
+  // 현재 선택된 필터 (임시)
+  tempCategories: CategoryCode[];
+  tempNoiseLevels: NoiseLevel[];
+  tempRadius: Radius;
+
+  // 적용 완료 상태
+  appliedCategories: CategoryCode[];
+  appliedNoiseLevels: NoiseLevel[];
+  appliedRadius: Radius;
+
+  // 필터 UI 동작용
+  resetTrigger: boolean;
+
+  // 액션
+  toggleCategory: (category: Category) => void;
+  toggleNoiseLevel: (level: NoiseLevel) => void;
+  selectRadius: (radius: Radius) => void;
+
+  applyFilters: () => void;      // 적용 버튼 클릭
+  resetFilters: () => void;      // 초기화 버튼 클릭
+  discardFilters: () => void;    // 닫기 시 선택 무시
+  triggerReset: () => void;
 }
 
-export const useFilterDataStore = create<FilterDataState>((set) => ({
-    selectedCategories: [],
-    selectedNoiseLevels: ["quiet"],
-    selectedRadius: 200,
-    applied: false,
-    resetTrigger: false,
+export const useFilterDataStore = create<FilterDataState>((set, get) => ({
+  tempCategories: [],
+  tempNoiseLevels: ["quiet"],
+  tempRadius: 200,
 
-    toggleCategory: (category) =>
-        set((state) => {
-            const code = categoryMap[category]; // 자동 변환
-            const exists = state.selectedCategories.includes(code);
-            return {
-                selectedCategories: exists
-                ? state.selectedCategories.filter((c) => c !== code)
-                : [...state.selectedCategories, code],
-            };
-        }),
+  appliedCategories: [],
+  appliedNoiseLevels: ["quiet"],
+  appliedRadius: 200,
 
-    toggleNoiseLevel: (level) =>
-        set((state) => {
-            const exists = state.selectedNoiseLevels.includes(level);
-            return {
-                selectedNoiseLevels: exists
-                ? state.selectedNoiseLevels.filter((n) => n !== level)
-                : [...state.selectedNoiseLevels, level],
-            };
-        }),
+  resetTrigger: false,
 
-    selectRadius: (radius) => set({ selectedRadius: radius }),
+  toggleCategory: (category) => {
+    const code = categoryMap[category];
+    const temp = get().tempCategories;
+    set({
+      tempCategories: temp.includes(code)
+        ? temp.filter((c) => c !== code)
+        : [...temp, code],
+    });
+  },
+  toggleNoiseLevel: (level) => {
+    const temp = get().tempNoiseLevels;
+    set({
+      tempNoiseLevels: temp.includes(level)
+        ? temp.filter((n) => n !== level)
+        : [...temp, level],
+    });
+  },
+  selectRadius: (radius) => set({ tempRadius: radius }),
 
-    resetFilters: () =>
-        set({
-            selectedCategories: [],
-            selectedNoiseLevels: ["quiet"],
-            selectedRadius: 200,
-        }),
-    applyFilters: () => set({ applied: true }),
-    clearApplied: () => set({ applied: false }),
-    triggerReset: () => set((state) => ({ resetTrigger: !state.resetTrigger })), // 토글
+  applyFilters: () => {
+    const { tempCategories, tempNoiseLevels, tempRadius } = get();
+    set({
+      appliedCategories: tempCategories,
+      appliedNoiseLevels: tempNoiseLevels,
+      appliedRadius: tempRadius,
+      resetTrigger: !get().resetTrigger,
+    });
+  },
+
+  resetFilters: () => {
+    set({
+      tempCategories: [],
+      tempNoiseLevels: ["quiet"],
+      tempRadius: 200,
+      appliedCategories: [],
+      appliedNoiseLevels: ["quiet"],
+      appliedRadius: 200,
+      resetTrigger: !get().resetTrigger,
+    });
+  },
+
+  discardFilters: () => {
+    // 닫기 시 임시값 초기화
+    const { appliedCategories, appliedNoiseLevels, appliedRadius } = get();
+    set({
+      tempCategories: appliedCategories,
+      tempNoiseLevels: appliedNoiseLevels,
+      tempRadius: appliedRadius,
+    });
+  },
+
+  triggerReset: () => set((state) => ({ resetTrigger: !state.resetTrigger })),
 }));
