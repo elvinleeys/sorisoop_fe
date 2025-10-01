@@ -6,7 +6,6 @@ export async function fetchWrapper<T>(
 ): Promise<T> {
     const { accessToken, setAccessToken } = useAuthStore.getState();
 
-    console.log("fetchWrapper accessToken:", accessToken);
     const headers: HeadersInit = {
         "Content-Type": "application/json",
         ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
@@ -27,7 +26,7 @@ export async function fetchWrapper<T>(
 
     if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.message || "Request failed");
+        throw new Error(error.message || "API 요청 실패");
     }
 
     console.log("x-access-token:", res.headers.get("x-access-token"));
