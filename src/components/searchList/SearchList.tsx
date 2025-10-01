@@ -2,10 +2,11 @@
 
 import { useCurrentLocation } from "@/hook/useCurrentLocation";
 import { flexRowCenter } from "@/mixin/style";
+import { fetchKakaoPlaces } from "@/services/search/fetchKakaoPlace";
 import { useMapLocationStore } from "@/store/map/useMapLocationStore";
 import { KakaoPlace } from "@/types/kakaoPlace";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 type searchListProps = {
     keyword: string;
@@ -20,6 +21,7 @@ export default function SearchList({
 }: searchListProps) {
     const { lat: myLat, lng: myLng } = useCurrentLocation();
     const router = useRouter();
+    const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         if (!keyword || keyword.trim() === "" || myLat === null || myLng === null) {
@@ -28,30 +30,19 @@ export default function SearchList({
         }
 
         const controller = new AbortController(); // 이전 요청 취소용
-        const fetchPlaces = async () => {
-            try {
-                const res = await fetch(`/api/kakao/search?keyword=${encodeURIComponent(keyword)}&lat=${myLat}&lng=${myLng}`, {
-                    signal: controller.signal,
-                });
-
-                if (!res.ok) throw new Error("검색 실패");
-                
-                const data = await res.json();
-                
-                if (data.documents) {
-                    setPlaces(data.documents);
-                } else {
-                    setPlaces([]);
-                }
-            } catch (err: unknown) {
-                if (err instanceof DOMException && err.name === "AbortError") return; // 이전 요청 취소
-                console.error(err);
-                setPlaces([]);
-            }
-        };
-
-        fetchPlaces();
-
+        // debounce 적용
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(async () => {
+        try {
+            const results = await fetchKakaoPlaces(keyword, myLat, myLng, controller.signal);
+            setPlaces(results);
+        } catch (err: unknown) {
+            if (err instanceof DOMException && err.name === "AbortError") return;
+            console.error(err);
+            setPlaces([]);
+        }
+        }, 300);
+        
         return () => {
             controller.abort(); // 컴포넌트 언마운트 시 요청 취소
         };
