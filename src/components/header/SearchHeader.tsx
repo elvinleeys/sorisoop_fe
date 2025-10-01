@@ -8,9 +8,14 @@ import { BackButton } from "soridam-design-system";
 type SearchBarProps = {
   keyword: string; // 외부 상태 연결
   setKeyword: (value: string) => void; // 입력 변경 시 상태 업데이트
+  onSearch?: () => void;
 };
 
-export default function SearchHeader({keyword, setKeyword}: SearchBarProps) {
+export default function SearchHeader({
+    keyword, 
+    setKeyword,
+    onSearch
+}: SearchBarProps) {
     const inputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
 
@@ -20,6 +25,17 @@ export default function SearchHeader({keyword, setKeyword}: SearchBarProps) {
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         setKeyword(e.target.value);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+            // 검색 엔터 동작
+            // 현재 페이지에서 바로 검색 실행하거나
+            // 필요 시 router.push("/map/search?keyword=...") 등으로 이동
+            inputRef.current?.blur(); // 모바일 키보드 닫기
+            console.log("검색 실행:", keyword);
+            if (onSearch) onSearch();
+        }
     };
 
     return (
@@ -43,6 +59,7 @@ export default function SearchHeader({keyword, setKeyword}: SearchBarProps) {
                     ref={inputRef}
                     value={keyword}
                     onChange={handleChange}
+                    onKeyDown={handleKeyDown}
                     className="
                         w-full 
                         h-full 
