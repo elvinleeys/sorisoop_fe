@@ -190,7 +190,7 @@ export default function KakaoMap({
       <div ref={mapRef} style={{ width: "100%", height }} />
       {showLocateButton && onMoveToMyLocation && (
         <button
-          className="absolute bottom-2 right-2 bg-white shadow-md rounded-full p-2 z-50"
+          className="absolute bottom-2 right-2 bg-white shadow-md rounded-full p-2 z-[10]"
           onClick={onMoveToMyLocation}
         >
           <Image src="/icons/locate-ico.svg" alt="내 위치로 이동" width={24} height={24}/>
