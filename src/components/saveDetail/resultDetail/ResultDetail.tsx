@@ -3,6 +3,7 @@ import SDecibelResult from "./decibelResult/SDecibelResult";
 import Comment from "./comment/Comment";
 import { flexCol } from "@/mixin/style";
 import { formatDateTime } from "@/util/formatDateTime";
+import { getDecibelLevel } from "@/util/getDecibelLevel";
 
 interface ResultDetailProps {
     placeName: string;
@@ -11,12 +12,6 @@ interface ResultDetailProps {
     measuredAt: string;
     comment: string;
 }
-
-const getDecibelLevel = (db: number) => {
-  if (db <= 70) return "quiet";
-  if (db < 100) return "moderate"; // 이미 db > 70 인 상황
-  return "loud"; // 나머지는 전부 100 이상
-};
 
 export default function ResultDetail({
     placeName,
