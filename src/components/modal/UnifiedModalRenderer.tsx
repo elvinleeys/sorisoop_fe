@@ -7,6 +7,7 @@ import BackModal from "@/components/modal/backModal/BackModal";
 import InfoModal from "@/components/modal/infoModal/InfoModal";
 import LogoutModal from "@/components/modal/logoutModal/LogoutModal";
 import DeleteAccountModal from "@/components/modal/deleteAccountModal/DeleteAccountModal";
+import DeleteModal from "./deleteModal/DeleteModal";
 
 export default function UnifiedModalRenderer() {
   const { currentModal, closeModal } = useModalStore();
@@ -16,6 +17,7 @@ export default function UnifiedModalRenderer() {
       <BackModal isOpen={currentModal === "back"} onClose={closeModal} />
       <InfoModal isOpen={currentModal === "info"} onClose={closeModal} />
       <LogoutModal isOpen={currentModal === "logout"} onClose={closeModal} />
+      <DeleteModal isOpen={currentModal === "delete"} onClose={closeModal} />
       <DeleteAccountModal isOpen={currentModal === "deleteAccount"} onClose={closeModal} />
     </ClientOnlyPortal>
   );
