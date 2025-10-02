@@ -21,3 +21,10 @@
 - 초기 지도 랜더링시 사용하는 /api/map과 필터적용시 사용되는 /api/map/with-measurement를 통합
 - /map/search의 입력시마다 과도한 fetching을 막기 위해 debounce 도입
 - /search, placeDetailSheet, /map 관련 fetch함수 모듈화 및 response dto 설정
+
+## 2025.10.02
+- SideBar의 메뉴가 전부 준비되지 않아 menu를 map/object로 분리하고, SideBarItem 컴포넌트를 만들어 유지보수성을 높임
+- /save page의 데이터 fetching함수를 "loading" | "guest" | "empty" | "data" 와 같이 enum형태로 정리 및 fetch함수를 커스텀 훅함수로 추출
+- /save/[id] 페이지의 데이터 fetch함수 커스텀 hook 함수로 추출 및 dto 정의
+- 로그인의 미지원 서비스에 대한 toast 알림 추가
+- 로그인의 fetch함수를 모듈화

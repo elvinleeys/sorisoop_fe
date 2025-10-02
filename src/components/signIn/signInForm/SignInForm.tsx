@@ -1,6 +1,7 @@
 "use client";
 
 import { flexCol, flexColCenter } from "@/mixin/style";
+import { signIn, SignInError } from "@/services/sign-in/signIn";
 import { useAuthStore } from "@/store/auth/authStore";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -25,37 +26,24 @@ export default function SignInForm () {
         setError("");
 
         try {
-            const res = await fetch("/api/auth/sign-in", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ email, password }),
-            });
+            const data = await signIn({ email, password });
 
-            const data = await res.json();
-
-            if (!res.ok) {
-                setError(data.message || "로그인 실패");
-                setLoading(false);
-                return;
-            }
-
-            // accessToken은 메모리상 저장
             if (data.accessToken) {
-                setAccessToken(data.accessToken); 
+                setAccessToken(data.accessToken);
             }
 
-            // 로그인 성공 시 / 경로나 원하는 페이지로 이동
             router.push("/");
-
         } catch (err) {
-            console.error(err);
-            setError("서버 오류가 발생했습니다.");
+            if (err instanceof SignInError) {
+                setError(err.message);
+            } else {
+                setError("서버 오류가 발생했습니다.");
+                console.error(err);
+            }
         } finally {
             setLoading(false);
         }
-    };
+  };
 
     return (
         <section 
@@ -75,8 +63,8 @@ export default function SignInForm () {
                 <EmailInput value={email} onChange={(e) => setEmail(e.target.value)} />
                 <PasswordInput value={password} onChange={(e) => setPassword(e.target.value)}/>
             </div>
-            <p className="w-full min-h-5 text-error text-sm text-center mb-0.5">
-                {error ?? ""}
+            <p className={`w-full min-h-5 text-error text-sm text-center mb-0.5 ${error ? 'visible' : 'invisible'}`}>
+                {error}
             </p>
             <Button
                 buttonType={loading ? "secondary" : "primary"} 
