@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import 'soridam-design-system/styles';
 import ToastContainer from "@/components/toast/ToastContainer";
-import SideBar from "@/components/sideBar/SideBar";
 import UnifiedModalRenderer from "@/components/modal/UnifiedModalRenderer";
 
 export const metadata: Metadata = {
@@ -18,10 +17,8 @@ export default function RootLayout({
     <html lang="ko" suppressHydrationWarning>
       <body className="bg-white antialiased">
           <div id="modal"></div>
-          <div id="sidebar" className="relative z-[9999]"></div> 
           {children}
           <UnifiedModalRenderer />
-          <SideBar />
           <ToastContainer />
       </body>
     </html>

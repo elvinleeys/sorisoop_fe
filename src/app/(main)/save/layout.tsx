@@ -1,4 +1,5 @@
 import { SaveHeader } from "@/components/header";
+import SideBar from "@/components/sideBar/SideBar";
 import { flexCol } from "@/mixin/style";
 
 interface SaveLayoutProps {
@@ -17,11 +18,14 @@ export default function SaveLayout({ children }: SaveLayoutProps) {
                 h-full
                 pr-[1.3125rem] 
                 pl-[1.375rem]
+                pb-[7rem]
                 overflow-y-scroll
             `}
         >
             {children}
         </main>
+        <div id="sidebar"></div>
+        <SideBar />
     </div>
   );
 }
