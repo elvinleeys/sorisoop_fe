@@ -3,6 +3,7 @@
 import { flexCol, flexRow, flexRowBetween, flexRowCenter } from "@/mixin/style";
 import { Measurement } from "@/types/save/savelist";
 import { formatDateTime } from "@/util/formatDateTime";
+import { getDecibelLevel } from "@/util/getDecibelLevel";
 import Image from "next/image";
 import Link from "next/link";
 import { Decibel } from "soridam-design-system";
@@ -16,14 +17,10 @@ export default function SaveResult({
 }: Measurement) {
     const dateTime = new Date(measuredAt)
     const { date, time } = formatDateTime(dateTime);
-
-    const getDecibelLevel = (db: number) => {
-        if (db <= 70) return "quiet";
-        if (db > 70 && db < 100) return "moderate";
-        return "loud";
-    };
-
     const decibelLevel = getDecibelLevel(avgDecibel);
+
+    const dateTimeTextStyle = "text-sm text-neutral-sub";
+    const decibelBoxStyle = `w-[4.0625rem] h-[1.875rem] ${flexRowCenter} rounded-md bg-[#F5F5F5] text-sm !font-medium text-neutral-sub`;
 
     return (
         <Link href={`/save/${id}`} className="block">
@@ -65,10 +62,10 @@ export default function SaveResult({
                                 {placeName}
                             </h3>
                             <div className={`${flexRow} gap-1`}>
-                                <time className="text-sm text-neutral-sub">
+                                <time className={dateTimeTextStyle}>
                                     {date}
                                 </time>
-                                <time className="text-sm text-neutral-sub">
+                                <time className={dateTimeTextStyle}>
                                     {time}
                                 </time>
                             </div>
@@ -79,30 +76,12 @@ export default function SaveResult({
                     </div>
                     <div className={`${flexRow} gap-2`}>
                         <span 
-                            className={`
-                                w-[4.0625rem] 
-                                h-[1.875rem] 
-                                ${flexRowCenter} 
-                                rounded-md 
-                                bg-[#F5F5F5] 
-                                text-sm 
-                                !font-medium 
-                                text-neutral-sub
-                            `}
+                            className={decibelBoxStyle}
                         >
                             평균 {avgDecibel.toFixed(0)}
                         </span>
                         <span 
-                            className={`
-                                w-[4.0625rem] 
-                                h-[1.875rem] 
-                                ${flexRowCenter} 
-                                rounded-md 
-                                bg-[#F5F5F5] 
-                                text-sm 
-                                !font-medium 
-                                text-neutral-sub
-                            `}
+                            className={decibelBoxStyle}
                         >
                             최대 {maxDecibel.toFixed(0)}
                         </span>
