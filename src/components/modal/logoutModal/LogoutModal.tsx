@@ -3,6 +3,7 @@
 import { Button, Modal } from "soridam-design-system";
 import { flexColCenter, flexRowCenter } from "@/mixin/style";
 import { useAuthStore } from "@/store/auth/authStore";
+import { useRouter } from "next/navigation";
 
 interface LogoutModalProps {
   isOpen: boolean;
@@ -13,11 +14,13 @@ export default function LogoutModal({
     isOpen,
     onClose
 }: LogoutModalProps) {
+    const router = useRouter();
 
     const handleLogout = async () => {
         await fetch("/api/auth/logout", { method: "POST" });
         useAuthStore.getState().setAccessToken(null); // 상태 초기화
         onClose();
+        router.push("/");
     }
 
     return (
