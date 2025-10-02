@@ -8,7 +8,7 @@ export default function ToastContainer() {
     const toasts = useToastStore((state) => state.toasts);
 
     return (
-        <div className={`${flexColCenter} fixed bottom-12 left-1/2 transform -translate-x-1/2 z-[9999] gap-2 sm:bottom-6 sm:left-auto sm:right-6`}>
+        <div className={`${flexColCenter} fixed bottom-12 left-1/2 transform -translate-x-1/2 z-[700] gap-2 sm:bottom-6 sm:left-auto sm:right-6`}>
             <AnimatePresence>
                 {toasts.map((toast) => (
                     <motion.div
