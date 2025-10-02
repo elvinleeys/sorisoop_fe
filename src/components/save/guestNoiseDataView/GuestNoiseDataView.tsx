@@ -3,18 +3,20 @@ import NoDataImg from "../noDataImg/NoDataImg";
 import Link from "next/link";
 
 export default function GuestNoiseDataView() {
+    const textStyle = "text-base";
+
     return (
         <section className={`${flexColCenter} gap-6 mt-17`}>
             <div className={`${flexCol} gap-8`}>
                 <NoDataImg />
                 <div className="text-center text-neutral-black">
-                    <p className="text-base">
+                    <p className={textStyle}>
                         로그인되지 않았어요.
                     </p>
-                    <p className="text-base">
+                    <p className={textStyle}>
                         로그인하면 측정한 소음을 저장하고
                     </p>
-                    <p className="text-base">
+                    <p className={textStyle}>
                         기록을 확인할 수 있어요.
                     </p>
                 </div>
