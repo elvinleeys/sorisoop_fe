@@ -5,9 +5,10 @@ import { useSidebarStore } from "@/store/sideBar/SideBarStore";
 import { BackButton } from "soridam-design-system";
 import { flexCol, flexRow } from "@/mixin/style";
 import { useAuthStore } from "@/store/auth/authStore";
-import Link from "next/link";
 import { useModalStore } from "@/store/modal/useModalStore";
 import ClientOnlyPortal from "../clientOnlyPortal/ClientOnlyPortal";
+import { SideBarMenu } from "./SideBarMenu";
+import SideBarItem from "./SideBarItem";
 
 export default function SideBar() {
     const { isOpen, close: sidebarClose } = useSidebarStore();
@@ -24,12 +25,18 @@ export default function SideBar() {
         openModal("deleteAccount");
     }
 
+    const sections = SideBarMenu(
+        accessToken,
+        handleLogoutModal,
+        handleDeleteAccountModal
+    );
+
     return(
         <ClientOnlyPortal containerId="sidebar">
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        className="fixed top-0 left-0 w-full h-full bg-white"
+                        className="fixed top-0 left-0 w-full h-full bg-white z-[500]"
                         initial={{ x: "100%" }}
                         animate={{ x: 0 }}
                         exit={{ x: "100%" }}
@@ -53,104 +60,25 @@ export default function SideBar() {
                             </h2>
                         </header>
                         <main className="divide-y">
-                            <section 
-                                className={`
-                                    ${flexCol}
-                                    gap-[1.125rem]
-                                    w-full 
-                                    py-[1.125rem] 
-                                    px-[1.5rem]
-                                    border-b-[#F4F8FF]
-                                `}
-                            >
-                                <h3 className="text-base !font-bold text-[#2A2A2A]">
-                                    정보
-                                </h3>
-                                <p className="text-sm text-neutral-sub">
-                                    공지사항
-                                </p>
-                            </section>
-                            <section 
-                                className={`
-                                    ${flexCol}
-                                    gap-[1.125rem]
-                                    w-full 
-                                    py-[1.125rem] 
-                                    px-[1.5rem]
-                                    border-b-[#F4F8FF]
-                                `}
-                            >
-                                <h3 className="text-base !font-bold text-[#2A2A2A]">
-                                    고객센터
-                                </h3>
-                                <p className="text-sm text-neutral-sub">
-                                    1:1 문의
-                                </p>
-                            </section>
-                            <section 
-                                className={`
-                                    ${flexCol}
-                                    gap-[1.125rem]
-                                    w-full 
-                                    py-[1.125rem] 
-                                    px-[1.5rem]
-                                    border-b-[#F4F8FF]
-                                `}
-                            >
-                                <h3 className="text-base !font-bold text-[#2A2A2A]">
-                                    약관
-                                </h3>
-                                <p className="text-sm text-neutral-sub">
-                                    개인정보 처리방침
-                                </p>
-                                <p className="text-sm text-neutral-sub">
-                                    서비스 이용약관
-                                </p>
-                                <p className="text-sm text-neutral-sub">
-                                    오픈소스 라이선스
-                                </p>
-                                {!accessToken ? (
-                                    // 로그인 안 된 상태 → /sign-in으로 이동
-                                    <Link
-                                        href="/sign-in"
-                                        className="
-                                            text-sm 
-                                            leading-1 
-                                            text-[#0F6FFF]
-                                        "
-                                        onClick={sidebarClose}
-                                    >
-                                        로그인
-                                    </Link>
-                                ) : (
-                                    <>
-                                        <button
-                                            onClick={handleLogoutModal}
-                                            className="
-                                                text-start
-                                                text-sm 
-                                                leading-1 
-                                                text-[#0F6FFF] 
-                                                cursor-pointer
-                                            "
-                                        >
-                                            로그아웃
-                                        </button>
-                                        <button
-                                            onClick={handleDeleteAccountModal}
-                                            className="
-                                                text-start
-                                                text-sm 
-                                                leading-1 
-                                                text-[#FF826E] 
-                                                cursor-pointer
-                                            "
-                                        >
-                                            회원탈퇴
-                                        </button>
-                                    </>
-                                )}
-                            </section>
+                            {sections.map((section, idx) => (
+                                <section
+                                    key={idx}
+                                    className={`${flexCol} gap-[1.125rem] w-full py-[1.125rem] px-[1.5rem] border-b-[#F4F8FF]`}
+                                >
+                                    <h3 className="text-base !font-bold text-[#2A2A2A]">
+                                        {section.title}
+                                    </h3>
+                                    {section.items.map((item, i) => (
+                                        <SideBarItem
+                                            label={item.label}
+                                            path={item.path}
+                                            onClick={item.onClick}
+                                            className={item.className}
+                                            key={i} // key는 React 전용 prop, item 스프레드에 포함되지 않음
+                                        />
+                                    ))}
+                                </section>
+                            ))}
                         </main>
                     </motion.div>
                 )}
