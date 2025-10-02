@@ -1,4 +1,4 @@
-import SaveMainPage from "@/components/saveMainPage/SaveMainPage";
+import SaveMainPage from "@/components/save/SaveMainPage";
 
 export default function SavePage() {
     return <SaveMainPage />;
