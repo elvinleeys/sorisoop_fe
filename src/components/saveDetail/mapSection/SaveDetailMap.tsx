@@ -1,6 +1,7 @@
 "use client";
 
 import KakaoMap from "@/components/kakaoMap/KakaoMap";
+import { getMarkerImg } from "@/util/getDecibelLevel";
 
 interface SaveDetailMapProps {
   avgDecibel: number;
@@ -8,15 +9,9 @@ interface SaveDetailMapProps {
   lng: number;
 }
 
-const getDecibelImg = (db: number) => {
-    if (db <= 70) return "/icons/quiet.svg";
-    if (db > 70 && db < 100) return "/icons/moderate.svg";
-    return "/icons/loud.svg";
-};
-
 export default function SaveDetailMap({ avgDecibel, lat, lng }: SaveDetailMapProps) {
 
-    const imgSrc = getDecibelImg(avgDecibel);
+    const imgSrc = getMarkerImg(avgDecibel);
     const marker = [{ lat, lng, image: imgSrc }];
 
     return (
