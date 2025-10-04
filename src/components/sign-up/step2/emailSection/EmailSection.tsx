@@ -1,7 +1,9 @@
 "use client";
 
 import { flexCol } from "@/mixin/style";
+import { fetchCheckEmail } from "@/services/sign-up/check-email";
 import { useSignUpStore } from "@/store/signUp/SignUpStore";
+import { validateEmail } from "@/util/validation";
 import { useState } from "react";
 import { Input } from "soridam-design-system";
 
@@ -21,29 +23,23 @@ export default function EmailSection({ onValidEmail }: EmailSectionProps) {
     };
 
     const handleBlur = async () => {
+        // 1️⃣ 로컬 유효성 검사
         const validationError = validateEmail(email);
         setError(validationError ?? "");
-        setSuccess(""); // 새로 blur하면 성공 메시지 초기화
-        
+        setSuccess("");
         if (validationError) return;
 
-        try{
-            const res = await fetch("/api/auth/check-email", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email }),
-            });
-
-            const data = await res.json();
-
-            if (data.exists) {
-                setError("이미 등록된 이메일입니다.");
-                setSuccess("");
-            } else {
-                setError("");
-                setSuccess("사용 가능한 이메일입니다.");
-                onValidEmail(email); // 상위로 전달
-            }
+        // 2️⃣ 서버 중복 확인
+        try {
+        const { exists } = await fetchCheckEmail({ email });
+        if (exists) {
+            setError("이미 등록된 이메일입니다.");
+            setSuccess("");
+        } else {
+            setError("");
+            setSuccess("사용 가능한 이메일입니다.");
+            onValidEmail(email); // 상위로 전달
+        }
         } catch (err) {
             console.error(err);
             setError("서버와 통신 중 오류가 발생했습니다.");
@@ -87,28 +83,4 @@ export default function EmailSection({ onValidEmail }: EmailSectionProps) {
             )}
         </section>
     );
-}
-
-// 이메일 검증 함수
-function validateEmail(email: string): string | null {
-    if (!email) return "이메일을 입력해주세요.";
-
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!regex.test(email)) return "올바른 이메일 형식이 아닙니다.";
-
-    const allowedDomains = [
-            "naver.com",
-            "gmail.com",
-            "daum.net",
-            "kakao.com",
-            "hotmail.com",
-            "outlook.com",
-            "yahoo.com",
-    ];
-    const domain = email.split("@")[1];
-    if (!domain || !allowedDomains.includes(domain)) {
-        return "사용하실 수 없는 이메일입니다.";
-    }
-
-    return null;
 }

@@ -24,7 +24,6 @@ export default function StepTwoForm() {
 
     // 버튼 타입 결정
     const buttonType = validEmail && validPassword ? "primary" : "secondary";
-
     
     return (
         <form className={`h-[36.3125rem] ${flexCol}`}>

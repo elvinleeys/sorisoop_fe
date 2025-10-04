@@ -2,6 +2,7 @@
 
 import { flexCol } from "@/mixin/style";
 import { useSignUpStore } from "@/store/signUp/SignUpStore";
+import { validatePasswordConfirm, validatePasswordValue } from "@/util/validation";
 import { useState } from "react";
 import { Input } from "soridam-design-system";
 
@@ -106,18 +107,4 @@ export default function PasswordSection({ onValidPassword }: PasswordSectionProp
             )}
         </section>
     );
-}
-
-function validatePasswordValue(password: string): string | null {
-    if (!password) return "비밀번호를 입력해주세요.";
-    if (password.length < 8) return "비밀번호는 8자 이상이어야 합니다.";
-    if (!/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) {
-        return "사용하실 수 없는 비밀번호입니다.";
-    }
-    return null;
-}
-
-function validatePasswordConfirm(password: string, confirm: string): string | null {
-    if (password !== confirm) return "비밀번호가 일치하지 않습니다.";
-    return null;
 }
