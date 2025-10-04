@@ -1,6 +1,7 @@
 "use client";
 
 import { flexRowCenter } from "@/mixin/style";
+import { signUpUser } from "@/services/sign-up/signUpUser";
 import { useSignUpStore } from "@/store/signUp/SignUpStore";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
@@ -9,24 +10,23 @@ import { Button } from "soridam-design-system";
 export default function StepThreeForm() {
     const { formData } = useSignUpStore();
     const router = useRouter();
+    const scrollRef = useRef<HTMLDivElement>(null);
+
     const [isScrolledToEnd, setIsScrolledToEnd] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    const scrollRef = useRef<HTMLDivElement>(null);
-
     const handleScroll = () => {
         if (!scrollRef.current) return;
         const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
-        // scroll이 끝까지 내려갔을 경우
-        if (scrollTop + clientHeight >= scrollHeight - 5) {
-            setIsScrolledToEnd(true);
-        }
+        setIsScrolledToEnd(scrollTop + clientHeight >= scrollHeight - 5);
     };
 
     const handleSubmit = async () => {
         if (!isScrolledToEnd) return;
-        if (!formData.email || !formData.password || !formData.nickname) {
+
+        const { email, password, nickname } = formData;
+        if (!email || !password || !nickname) {
             setError("회원가입 정보를 확인해주세요.");
             return;
         }
@@ -35,29 +35,17 @@ export default function StepThreeForm() {
         setError("");
 
         try {
-            const res = await fetch("/api/auth/sign-up", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    email: formData.email,
-                    password: formData.password,
-                    nickname: formData.nickname,
-                }),
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                setError(data.message || "회원가입 중 오류가 발생했습니다.");
-                setLoading(false);
-                return;
-            }
-
-            // 회원가입 성공 시 /sign-in 페이지로 이동
+            await signUpUser({ email, password, nickname });
             router.push("/sign-in");
-        } catch (err) {
+        } catch (err) { // err: any 제거
             console.error(err);
-            setError("서버와 통신 중 오류가 발생했습니다.");
+            // 에러 객체의 타입 확인 후 메시지 설정
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError('서버와 통신 중 오류가 발생했습니다.');
+            }
+        } finally {
             setLoading(false);
         }
     };
