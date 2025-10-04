@@ -2,6 +2,7 @@
 
 import { flexCol, flexRowCenter } from "@/mixin/style";
 import { useSignUpStore } from "@/store/signUp/SignUpStore";
+import { validateNickname } from "@/util/validation";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button, Input } from "soridam-design-system";
@@ -11,22 +12,7 @@ export default function StepOneForm() {
     const { formData, setFormData } = useSignUpStore();
 
     const [nickname, setNickname] = useState(formData.nickname ?? "");
-    const [error, setError] = useState<string>("");;
-
-    // ✅ 유효성 검사 함수
-    const validateNickname = (value: string): string | null => {
-        if (!value.trim()) {
-            return "닉네임을 입력해주세요";
-        }
-        // 한글 자모(ㄱ-ㅎ, ㅏ-ㅣ)까지 허용
-        if (/[^a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ]/.test(value)) {
-            return "닉네임에 특수문자는 사용할 수 없습니다";
-        }
-        if (value.length > 8) {
-            return "닉네임은 최대 8글자까지 가능합니다";
-        }
-        return null;
-    };
+    const [error, setError] = useState<string>("");
 
     // ✅ 입력 핸들러
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
