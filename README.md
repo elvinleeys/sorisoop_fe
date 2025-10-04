@@ -28,3 +28,9 @@
 - /save/[id] 페이지의 데이터 fetch함수 커스텀 hook 함수로 추출 및 dto 정의
 - 로그인의 미지원 서비스에 대한 toast 알림 추가
 - 로그인의 fetch함수를 모듈화
+
+## 2025.10.03
+- 회원가입 유효성 검사 모듈화
+- SignUpHeader의 stepMap 정리 및 뒤로가기 버튼 로직 정리
+- 이메일 중복 체크 관련 fetch 함수 모듈화/Response DTO 정의
+- 회원가입 fetch함수 모듈화 및 Response DTO 정의

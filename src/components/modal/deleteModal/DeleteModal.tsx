@@ -36,7 +36,7 @@ export default function DeleteModal({
             if (res.success) {
                 addToast(res.message || "삭제가 완료되었습니다.", 2000);
                 onClose();
-                router.push("/save");
+                router.push("/");
             } else {
                 throw new Error(res.message || "삭제 실패");
             }
