@@ -5,8 +5,8 @@ import { useSignUpStore } from "@/store/signUp/SignUpStore";
 import { usePathname, useRouter } from "next/navigation";
 import { BackButton } from "soridam-design-system";
 
-const stepMap: Record<string, string> = {
-  "/sign-up": "/sign-in",
+const stepMap: Record<string, string | null> = {
+  "/sign-up": null,
   "/sign-up/step2": "/sign-up/step2",
   "/sign-up/step3": "/sign-up/step3",
 };
@@ -20,13 +20,11 @@ export default function SignUpHeader() {
     const handleBack = () => {
         if (path === "/sign-up") {
             resetSignUp();          // ✅ 회원가입 데이터 초기화
-            router.push("/sign-in"); // ✅ 로그인 화면으로 이동
-        } else if (prevPath && prevPath !== path) {
-            router.push(prevPath);   // 이전 단계로 이동
-        } else {
-            router.back();           // ✅ fallback
+            router.push("/sign-in");// ✅ 로그인 화면으로 이동
+        } else if (prevPath) {
+            router.push(prevPath);  // ✅ 이전 단계로 이동
         }
-    }
+    };
 
     return (
         <header 
