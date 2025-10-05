@@ -5,12 +5,8 @@ import { Button, Modal } from "soridam-design-system";
 import { flexColCenter, flexRowCenter } from "@/mixin/style";
 import { useParams, useRouter } from "next/navigation";
 import { useToastStore } from "@/store/toast/useToastStore";
-import { fetchWrapper } from "@/lib/fetchWrapper";
-
-interface DeleteResponse {
-  success: boolean;
-  message?: string;
-}
+import { DeleteMeasurementResponse } from "@/types/dto/deleteMeasurement";
+import { deleteMeasurement } from "@/services/measurement/deleteMeasurement";
 
 interface DeleteModalProps {
   isOpen: boolean;
@@ -28,21 +24,18 @@ export default function DeleteModal({
 
     const handleDelete = async () => {
         try {
-            const res = await fetchWrapper<DeleteResponse>(`/api/delete-measurement/${listId}`, {
-                method: "DELETE",
-                credentials: "include",
-            });
-
-            if (res.success) {
-                addToast(res.message || "삭제가 완료되었습니다.", 2000);
-                onClose();
-                router.push("/");
-            } else {
-                throw new Error(res.message || "삭제 실패");
-            }
+            const res: DeleteMeasurementResponse = await deleteMeasurement(listId);
+            addToast(res.message || "삭제가 완료되었습니다.", 2000);
+            onClose();
+            router.push("/");
         } catch (err) {
-            console.error(err);
-            addToast("삭제 중 오류 발생", 2000);
+            if (err instanceof Error) {
+                console.error(err);
+                addToast(err.message || "삭제 중 오류 발생", 2000);
+            } else {
+                console.error("예상치 못한 에러:", err);
+                addToast("삭제 중 알 수 없는 오류 발생", 2000);
+            }
         }
     };
 
