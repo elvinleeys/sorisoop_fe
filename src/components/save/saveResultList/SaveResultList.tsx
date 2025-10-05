@@ -1,7 +1,7 @@
 "use client";
 
 import SaveResult from "../saveResult/SaveResult";
-import { Measurement } from "@/types/save/savelist";
+import { Measurement } from "@/types/dto/savelist";
 
 interface SaveResultListProps {
   data: Measurement[];
