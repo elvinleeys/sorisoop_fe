@@ -58,11 +58,19 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
         comments: comments.map((c) => c.comment),
       },
     });
-  } catch (err: any) {
-    console.error("API error", err);
-    return NextResponse.json(
-      { success: false, message: err.message },
-      { status: 500 }
-    );
+  } catch (err) {
+    if (err instanceof Error) {
+      console.error("API error", err);
+      return NextResponse.json(
+        { success: false, message: err.message },
+        { status: 500 }
+      );
+    } else {
+      console.error("Unexpected error", err);
+      return NextResponse.json(
+        { success: false, message: "서버에서 알 수 없는 오류가 발생했습니다." },
+        { status: 500 }
+      );
+    }
   }
 }
