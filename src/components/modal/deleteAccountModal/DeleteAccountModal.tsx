@@ -5,6 +5,7 @@ import { Button, Modal } from "soridam-design-system";
 import { flexColCenter, flexRowCenter } from "@/mixin/style";
 import { useAuthStore } from "@/store/auth/authStore";
 import { useRouter } from "next/navigation";
+import { deleteAccountRequest } from "@/services/auth/auth";
 
 interface DeleteAccountModalProps {
   isOpen: boolean;
@@ -18,29 +19,17 @@ export default function DeleteAccountModal({
     const router = useRouter();
     const { setAccessToken } = useAuthStore();
 
-    const deleteAccount = async() => {
+    const deleteAccount = async () => {
         try {
-            const res = await fetch("/api/auth/delete", {
-                method: "DELETE",
-                credentials: "include", // 쿠키 포함
-            });
-
-            const data = await res.json();
-
-            if (res.ok) {
-                console.log(data.message); // "회원 탈퇴가 완료되었습니다."
-                // zustand에서 accessToken 제거
-                setAccessToken(null);
-                onClose();
-                // 페이지 이동 등 처리
-                router.push("/");
-            } else {
-                console.error("회원 탈퇴 실패:", data.message);
-            }
+            const data = await deleteAccountRequest();
+            console.log(data.message);
+            setAccessToken(null);
+            onClose();
+            router.push("/");
         } catch (err) {
-            console.error("서버 오류:", err);
+            console.error(err);
         }
-    }
+    };
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
