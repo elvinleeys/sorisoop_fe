@@ -3,6 +3,7 @@ import "./globals.css";
 import 'soridam-design-system/styles';
 import ToastContainer from "@/components/toast/ToastContainer";
 import UnifiedModalRenderer from "@/components/modal/UnifiedModalRenderer";
+import { Provider } from "./QueryClientProvider";
 
 export const metadata: Metadata = {
   title: 'Soridam Noise Map', // 사이트 기본 제목
@@ -16,10 +17,12 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className="bg-white antialiased">
-          <div id="modal"></div>
-          {children}
-          <UnifiedModalRenderer />
-          <ToastContainer />
+          <Provider>
+            <div id="modal"></div>
+            {children}
+            <UnifiedModalRenderer />
+            <ToastContainer />
+          </Provider>
       </body>
     </html>
   );

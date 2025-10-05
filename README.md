@@ -34,3 +34,14 @@
 - SignUpHeader의 stepMap 정리 및 뒤로가기 버튼 로직 정리
 - 이메일 중복 체크 관련 fetch 함수 모듈화/Response DTO 정의
 - 회원가입 fetch함수 모듈화 및 Response DTO 정의
+
+## 2025.10.04
+- 로그아웃 및 회원탈퇴 관련 fetch함수 모듈화
+- getUserFromToken의 user 및 err에 대한 any type 제거
+- 소음 데이터 list관련 fetch함수 내 err의 any type 제거
+- placeDetailSheet관련 api route의 err any type 제거
+- 소음데이터 삭제 관련 response dto 설정
+- 소음데이터 list관련 response dto 설정
+- 소음데이터 등록 관련 fetch함수 모듈화
+- 소음데이터 삭제 관련 fetch함수 모듈화
+- ReactQuery 도입 준비 및 QueryClientProvider 컴포넌트화
