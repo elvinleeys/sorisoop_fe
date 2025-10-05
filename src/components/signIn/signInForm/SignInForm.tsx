@@ -1,7 +1,8 @@
 "use client";
 
 import { flexCol, flexColCenter } from "@/mixin/style";
-import { signIn, SignInError } from "@/services/sign-in/signIn";
+import { signIn } from "@/services/auth/auth";
+import { SignInError } from "@/types/dto/auth/login";
 import { useAuthStore } from "@/store/auth/authStore";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
