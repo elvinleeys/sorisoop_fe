@@ -4,6 +4,7 @@ import { Button, Modal } from "soridam-design-system";
 import { flexColCenter, flexRowCenter } from "@/mixin/style";
 import { useAuthStore } from "@/store/auth/authStore";
 import { useRouter } from "next/navigation";
+import { logoutRequest } from "@/services/auth/auth";
 
 interface LogoutModalProps {
   isOpen: boolean;
@@ -17,11 +18,16 @@ export default function LogoutModal({
     const router = useRouter();
 
     const handleLogout = async () => {
-        await fetch("/api/auth/logout", { method: "POST" });
-        useAuthStore.getState().setAccessToken(null); // 상태 초기화
-        onClose();
-        router.push("/");
-    }
+        try {
+            const res = await logoutRequest();
+            console.log(res.message); // 타입 안전하게 접근 가능
+            useAuthStore.getState().setAccessToken(null);
+            onClose();
+            router.push("/");
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
