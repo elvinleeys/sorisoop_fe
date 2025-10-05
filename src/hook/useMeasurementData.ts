@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Measurement } from "@/types/save/savelist";
+import { Measurement } from "@/types/dto/savelist";
 import { fetchWrapper } from "@/lib/fetchWrapper";
 
 type SaveStatus = "loading" | "guest" | "empty" | "data";
@@ -18,14 +18,19 @@ export function useMeasurementData() {
           setData(res);
           setStatus("data");
         }
-      } catch (err: any) {
-        if (err.message === "Unauthorized") {
-          setStatus("guest");
+      } catch (err) {
+        if (err instanceof Error) {
+          if (err.message === "Unauthorized") {
+            setStatus("guest");
+          } else {
+            console.error(err.message);
+          }
         } else {
-          console.error(err);
+          console.error("Unexpected error:", err);
         }
       }
     };
+    
     load();
   }, []);
 
