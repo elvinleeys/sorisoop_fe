@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Measurement from "@/model/Measurement";
-import { getUserFromToken } from "@/lib/auth";
+import { getUserFromToken } from "@/lib/getUserFromToken";
 import Place from "@/model/Place";
 
 export async function DELETE(

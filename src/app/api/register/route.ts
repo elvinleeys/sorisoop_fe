@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Place from "@/model/Place";
 import Measurement from "@/model/Measurement";
-import { getUserFromToken } from "@/lib/auth";
+import { getUserFromToken } from "@/lib/getUserFromToken";
 
 // DB 생성용 타입 (새 Place 생성 시)
 type NewPlaceData = {

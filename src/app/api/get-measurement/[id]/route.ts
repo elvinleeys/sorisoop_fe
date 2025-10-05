@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Measurement from "@/model/Measurement";
 import Place, { IPlace } from "@/model/Place";
-import { getUserFromToken } from "@/lib/auth";
+import { getUserFromToken } from "@/lib/getUserFromToken";
 
 export async function GET(req: NextRequest, context: { params: { id: string } }) {
     await dbConnect();
