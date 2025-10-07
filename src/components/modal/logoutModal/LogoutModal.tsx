@@ -5,6 +5,7 @@ import { flexColCenter, flexRowCenter } from "@/mixin/style";
 import { useAuthStore } from "@/store/auth/authStore";
 import { useRouter } from "next/navigation";
 import { logoutRequest } from "@/services/auth/auth";
+import { useMutation } from "@tanstack/react-query";
 
 interface LogoutModalProps {
   isOpen: boolean;
@@ -16,18 +17,22 @@ export default function LogoutModal({
     onClose
 }: LogoutModalProps) {
     const router = useRouter();
+    const { setAccessToken } = useAuthStore();
 
-    const handleLogout = async () => {
-        try {
-            const res = await logoutRequest();
-            console.log(res.message); // 타입 안전하게 접근 가능
-            useAuthStore.getState().setAccessToken(null);
+    // ✅ React Query Mutation 적용
+    const { mutate: logoutMutate, isPending } = useMutation({
+        mutationFn: logoutRequest,
+        onSuccess: (res) => {
+            console.log(res.message);
+            setAccessToken(null);
             onClose();
             router.push("/");
-        } catch (error) {
-            console.error(error);
-        }
-    };
+        },
+        onError: (err) => {
+            console.error(err);
+            // 필요 시 UI 에러 표시 가능
+        },
+    });
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
@@ -65,7 +70,8 @@ export default function LogoutModal({
                     <Button 
                         buttonType="primary" 
                         size="xsmall"
-                        onClick={handleLogout}
+                        onClick={() => logoutMutate()}
+                        disabled={isPending}
                     >
                         로그아웃
                     </Button>
