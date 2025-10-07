@@ -1,4 +1,4 @@
-import { NoiseDataDto } from "@/types/dto/Map";
+import { NoiseDataDto } from "@/types/dto/map/Map";
 import { getMarkerImg } from "@/util/getDecibelLevel";
 
 export interface FetchMarkersParams {
