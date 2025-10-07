@@ -5,17 +5,17 @@ import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useRef } from "react";
 import { BackButton } from "soridam-design-system";
 
-type SearchBarProps = {
-  keyword: string; // 외부 상태 연결
-  setKeyword: (value: string) => void; // 입력 변경 시 상태 업데이트
-  onSearch?: () => void;
+type SearchHeaderProps = {
+  keyword: string;
+  setKeyword: (value: string) => void;
+  onSearch?: () => void; // 부모에서 refetch 전달받음
 };
 
 export default function SearchHeader({
     keyword, 
-    setKeyword,
+    setKeyword, 
     onSearch
-}: SearchBarProps) {
+}: SearchHeaderProps) {
     const inputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
 
@@ -29,12 +29,8 @@ export default function SearchHeader({
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
-            // 검색 엔터 동작
-            // 현재 페이지에서 바로 검색 실행하거나
-            // 필요 시 router.push("/map/search?keyword=...") 등으로 이동
             inputRef.current?.blur(); // 모바일 키보드 닫기
-            console.log("검색 실행:", keyword);
-            if (onSearch) onSearch();
+            if (onSearch) onSearch(); // refetch 호출
         }
     };
 
