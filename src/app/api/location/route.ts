@@ -1,4 +1,4 @@
-import { LocationResponse } from '@/types/dto/Location';
+import { LocationResponse } from '@/types/dto/main/Location';
 import { NextRequest, NextResponse } from 'next/server';
 
 type CategoryMap = {

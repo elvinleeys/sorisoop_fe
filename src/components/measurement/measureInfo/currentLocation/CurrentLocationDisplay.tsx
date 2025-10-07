@@ -2,10 +2,11 @@
 
 import { flexRow } from "@/mixin/style";
 import Image from "next/image";
-import { useEffect } from "react";
 import { useLocationStore } from "@/store/measurement/locationStore";
 import { useCurrentLocation } from "@/hook/useCurrentLocation";
 import { fetchLocation } from "@/services/measurement/fetchLocation";
+import { useQuery } from "@tanstack/react-query";
+import { LocationResponse } from "@/types/dto/main/Location";
 
 export default function CurrentLocationDisplay() {
   // store에서 location 상태와 setLocation 함수 가져오기
@@ -13,45 +14,35 @@ export default function CurrentLocationDisplay() {
   const setLocation = useLocationStore((state) => state.setLocation);
 
   // custom hook 사용
-  const { lat, lng, error } = useCurrentLocation();
+  const { lat, lng, error: geoError } = useCurrentLocation();
 
-  useEffect(() => {
-    if (!lat || !lng) return;
+  // React Query로 위치 정보 fetch
+  const { data, isSuccess, isError, isLoading } = useQuery<LocationResponse, Error>({
+    queryKey: ["current-location", lat, lng],
+    queryFn: () => fetchLocation(lat!, lng!),
+    enabled: !!lat && !!lng,
+    staleTime: 5 * 60 * 1000,
+  });
 
-    if (error) {
-      setLocation({
-        kakaoPlaceId: null,
-        placeName: error,
-        location: { type: "Point", coordinates: null },
-        categoryCode: null,
-        categoryName: null,
-      });
-      return;
-    }
+  if (isSuccess && data) {
+    setLocation({
+      kakaoPlaceId: data.kakaoPlaceId,
+      placeName: data.placeName,
+      location: data.location,
+      categoryCode: data.categoryCode,
+      categoryName: data.categoryName,
+    });
+  }
 
-    (async () => {
-      try {
-        const data = await fetchLocation(lat, lng);
-
-        setLocation({
-          kakaoPlaceId: data.kakaoPlaceId ?? null,
-          placeName: data.placeName,
-          location: data.location,
-          categoryCode: data.categoryCode ?? null,
-          categoryName: data.categoryName ?? null,
-        });
-      } catch (e) {
-        console.error(e);
-        setLocation({
-          kakaoPlaceId: null,
-          placeName: "위치 가져오기 실패",
-          location: { type: "Point", coordinates: null },
-          categoryCode: null,
-          categoryName: null,
-        });
-      }
-    })();
-  }, [lat, lng, error, setLocation]);
+  if (isError) {
+    setLocation({
+      kakaoPlaceId: null,
+      placeName: geoError ?? "위치 가져오기 실패",
+      location: { type: "Point", coordinates: null },
+      categoryCode: null,
+      categoryName: null,
+    });
+  }
 
   return (
     <div
@@ -76,7 +67,7 @@ export default function CurrentLocationDisplay() {
           text-ellipsis
         "
       >
-        {location.placeName}
+        {isLoading ? "위치 검색중" : location.placeName}
       </p>
     </div>
   );
