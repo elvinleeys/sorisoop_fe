@@ -6,6 +6,7 @@ import { flexColCenter, flexRowCenter } from "@/mixin/style";
 import { useAuthStore } from "@/store/auth/authStore";
 import { useRouter } from "next/navigation";
 import { deleteAccountRequest } from "@/services/auth/auth";
+import { useMutation } from "@tanstack/react-query";
 
 interface DeleteAccountModalProps {
   isOpen: boolean;
@@ -19,17 +20,20 @@ export default function DeleteAccountModal({
     const router = useRouter();
     const { setAccessToken } = useAuthStore();
 
-    const deleteAccount = async () => {
-        try {
-            const data = await deleteAccountRequest();
-            console.log(data.message);
+    // ✅ React Query Mutation 적용
+    const { mutate: deleteMutate, isPending, error } = useMutation({
+        mutationFn: deleteAccountRequest,
+        onSuccess: (data) => {
+            console.log(data.message); // 타입 안전하게 접근 가능
             setAccessToken(null);
             onClose();
             router.push("/");
-        } catch (err) {
+        },
+        onError: (err) => {
             console.error(err);
-        }
-    };
+            // 필요 시 Toast/Alert로 에러 UI 표시 가능
+        },
+    });
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
@@ -70,7 +74,8 @@ export default function DeleteAccountModal({
                     <Button 
                         buttonType="primary" 
                         size="xsmall"
-                        onClick={deleteAccount}
+                        onClick={() => deleteMutate()} 
+                        disabled={isPending}
                     >
                         탈퇴하기
                     </Button>

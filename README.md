@@ -45,3 +45,6 @@
 - 소음데이터 등록 관련 fetch함수 모듈화
 - 소음데이터 삭제 관련 fetch함수 모듈화
 - ReactQuery 도입 준비 및 QueryClientProvider 컴포넌트화
+
+## 2025.10.05 및 2025.10.07
+- 각 서비스 화면의 ReactQuery 도입
