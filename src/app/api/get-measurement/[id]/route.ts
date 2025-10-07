@@ -4,10 +4,12 @@ import Measurement from "@/model/Measurement";
 import Place, { IPlace } from "@/model/Place";
 import { getUserFromToken } from "@/lib/getUserFromToken";
 
-export async function GET(req: NextRequest, context: { params: { id: string } }) {
+export async function GET(req: NextRequest, context: { params: Promise<{ id: string }> }) {
     await dbConnect();
 
-    const { id } = context.params;
+    // context.params가 Promise이므로 먼저 await
+    const params = await context.params;
+    const { id } = params;
 
     // 토큰에서 유저 확인
     const accessToken = req.headers.get("authorization")?.split(" ")[1];
