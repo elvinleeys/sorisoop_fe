@@ -10,8 +10,9 @@ import { useReviewStore } from "@/store/register/reviewStore";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useToastStore } from "@/store/toast/useToastStore";
-import { fetchWrapper } from "@/lib/fetchWrapper";
 import { getDecibelLevel } from "@/util/getDecibelLevel";
+import { useMutation } from "@tanstack/react-query";
+import { registerMeasurement, RegisterPayload } from "@/services/measurement/register";
 
 export default function RegisterForm() {
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -23,8 +24,25 @@ export default function RegisterForm() {
     const { placeName, kakaoPlaceId, location: geo, categoryCode, categoryName } = location;
     const { value: comment, isValid, setSubmitAttempted, reset } = useReviewStore();
 
-    if (!avgDecibel || !maxDecibel || !startedAt || !geo?.coordinates) return null;
+    const mutation = useMutation({
+        mutationFn: (payload: RegisterPayload) => registerMeasurement(payload),
+        onSuccess: () => {
+            addToast(
+                "등록 완료! 측정 데이터와 한줄평이 저장되었습니다. 저장된 정보를 [저장 탭]에서 확인하세요.",
+                2000
+            );
+            resetRegisterState();
+            router.push("/");
+        },
+        onError: (err: unknown) => {
+            if (err instanceof Error) console.error(err.message);
+            else console.error("Unknown error", err);
+            setIsSubmitting(false);
+            addToast("측정 데이터 저장에 실패했습니다.", 2000);
+        },
+    });
 
+    if (!avgDecibel || !maxDecibel || !startedAt || !geo?.coordinates) return null;
     const decibelLevel = getDecibelLevel(avgDecibel);
     const { date, time } = formatDateTime(startedAt);
 
@@ -48,14 +66,14 @@ export default function RegisterForm() {
         reset();
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = () => {
         setSubmitAttempted(true);
         if (!isValid) return;
 
         setIsSubmitting(true);
 
-        const payload = {
-            placeName,
+        const payload: RegisterPayload = {
+            placeName: placeName!,
             kakaoPlaceId: kakaoPlaceId ?? null,
             location: geo,
             categoryCode: categoryCode || null,
@@ -68,27 +86,7 @@ export default function RegisterForm() {
             comment,
         };
 
-        try {
-            const data = await fetchWrapper("/api/register", {
-                method: "POST",
-                body: JSON.stringify(payload),
-            });
-
-            console.log("측정 데이터 저장 성공:", data);
-            addToast(
-                "등록 완료! 측정 데이터와 한줄평이 저장되었습니다. 저장된 정보를 [저장 탭]에서 확인하세요.",
-                2000
-            );
-
-            // ✅ Zustand 초기화
-            resetRegisterState();
-            router.push("/"); // 저장 후 이동
-        } catch (err: unknown) {
-            if (err instanceof Error) console.error(err.message);
-            else console.error("Unknown error", err);
-            setIsSubmitting(false);
-            addToast("측정 데이터 저장에 실패했습니다.", 2000);
-        }
+        mutation.mutate(payload);
     };
 
     return (
