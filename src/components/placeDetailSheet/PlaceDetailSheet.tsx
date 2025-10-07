@@ -6,15 +6,10 @@ import LocationInfo from "../register/registerForm/locationInfo/LocationInfo";
 import { formatDateTime } from "@/util/formatDateTime";
 import ClientOnlyPortal from "../clientOnlyPortal/ClientOnlyPortal";
 import { flexCol, flexRowCenter } from "@/mixin/style";
-import { useEffect, useState } from "react";
 import { fetchPlaceDetail } from "@/services/map/fetchPlaceDetail";
 import { getDecibelLevel } from "@/util/getDecibelLevel";
-
-interface PlaceDetailResponse {
-  placeName: string;
-  chart: { timeRange: string; db: number; count: number }[];
-  comments: string[];
-}
+import { useQuery } from "@tanstack/react-query";
+import { PlaceDetailResponse } from "@/types/dto/map/PlaceDetail";
 
 function getCurrentRange(): "5-11" | "11-18" | "18-22" {
   const hour = new Date().getHours();
@@ -25,35 +20,27 @@ function getCurrentRange(): "5-11" | "11-18" | "18-22" {
 
 export default function PlaceDetailSheet() {
     const { isOpen, closeSheet, selectedMarker } = useBottomSheetStore();
-    const [data, setData] = useState<PlaceDetailResponse | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-
     const Newtime = new Date();
     const { date, time } = formatDateTime(Newtime);
-
     const currentRange = getCurrentRange();
 
-    useEffect(() => {
-        if (!isOpen || !selectedMarker) return;
-
-        setLoading(true);
-        setError(null);
-
-        fetchPlaceDetail(selectedMarker.id)
-        .then(setData)
-        .catch((e) => {
-            console.error(e);
-            setError(e.message);
-            setData(null);
-        })
-        .finally(() => setLoading(false));
-    }, [isOpen, selectedMarker]);
+    // ✅ React Query 사용
+    const {data, isLoading, isError, error} = useQuery<PlaceDetailResponse, Error>({
+        queryKey: ["placeDetail", selectedMarker?.id],
+        queryFn: async () => {
+            if (!selectedMarker) throw new Error("Marker가 선택되지 않았습니다.");
+            return fetchPlaceDetail(selectedMarker.id);
+        },
+        enabled: !!isOpen && !!selectedMarker,
+        staleTime: 1000 * 60 * 5,
+    });
 
     const chartData = data?.chart ?? [];
     const reviews = data?.comments.map((c, idx) => ({ id: idx, text: c })) ?? [];
 
-    const currentSlot = chartData.find((c) => c.timeRange === currentRange);
+    const currentSlot = chartData.find((c: { timeRange: string; db: number; count: number }) => 
+        c.timeRange === currentRange
+    );
     const avgDecibel = currentSlot?.db ?? 0;
 
     // ✅ util 함수 사용
@@ -67,17 +54,17 @@ export default function PlaceDetailSheet() {
                 title="장소 상세보기"
             >
                 <section className={`${flexCol} max-h-full min-h-0`}>
-                    {loading && (
+                    {isLoading && (
                         <p className="p-4 text-center">
                             불러오는 중...
                         </p>
                     )}
-                    {error && (
+                    {isError && (
                         <p className="p-4 text-center text-red-500">
-                            {error}
+                            {error instanceof Error ? error.message : "알 수 없는 오류"}
                         </p>
                     )}
-                    {!loading && data && (
+                    {!isLoading && data && (
                         <>
                             <LocationInfo
                                 placeName={data.placeName}

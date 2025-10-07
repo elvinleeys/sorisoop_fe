@@ -1,4 +1,4 @@
-import { PlaceDetailResponse } from "@/types/dto/PlaceDetail";
+import { PlaceDetailResponse } from "@/types/dto/map/PlaceDetail";
 
 export async function fetchPlaceDetail(id: string) {
   const res = await fetch(`/api/map/place-detail/${id}`);
