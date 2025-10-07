@@ -3,6 +3,7 @@
 import { flexRowCenter } from "@/mixin/style";
 import { signUpUser } from "@/services/sign-up/signUpUser";
 import { useSignUpStore } from "@/store/signUp/SignUpStore";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { Button } from "soridam-design-system";
@@ -13,7 +14,6 @@ export default function StepThreeForm() {
     const scrollRef = useRef<HTMLDivElement>(null);
 
     const [isScrolledToEnd, setIsScrolledToEnd] = useState(false);
-    const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
     const handleScroll = () => {
@@ -22,32 +22,29 @@ export default function StepThreeForm() {
         setIsScrolledToEnd(scrollTop + clientHeight >= scrollHeight - 5);
     };
 
-    const handleSubmit = async () => {
-        if (!isScrolledToEnd) return;
-
-        const { email, password, nickname } = formData;
-        if (!email || !password || !nickname) {
-            setError("회원가입 정보를 확인해주세요.");
-            return;
-        }
-
-        setLoading(true);
-        setError("");
-
-        try {
-            await signUpUser({ email, password, nickname });
-            router.push("/sign-in");
-        } catch (err) { // err: any 제거
-            console.error(err);
-            // 에러 객체의 타입 확인 후 메시지 설정
-            if (err instanceof Error) {
-                setError(err.message);
-            } else {
-                setError('서버와 통신 중 오류가 발생했습니다.');
+    // ✅ React Query mutation
+    const { mutate: signUpMutate, isPending } = useMutation({
+        mutationFn: () => {
+            const { email, password, nickname } = formData;
+            if (!email || !password || !nickname) {
+                throw new Error("회원가입 정보를 확인해주세요.");
             }
-        } finally {
-            setLoading(false);
-        }
+            return signUpUser({ email, password, nickname });
+        },
+        onSuccess: () => {
+            router.push("/sign-in");
+        },
+        onError: (err) => {
+            console.error(err);
+            if (err instanceof Error) setError(err.message);
+            else setError("서버와 통신 중 오류가 발생했습니다.");
+        },
+    });
+
+    const handleSubmit = () => {
+        if (!isScrolledToEnd) return;
+        setError("");
+        signUpMutate();
     };
 
     return(
@@ -131,12 +128,12 @@ export default function StepThreeForm() {
             </p>
             <div className={`w-full ${flexRowCenter} mt-[1.4375rem]`}>
                 <Button 
-                    buttonType={isScrolledToEnd || loading ? "primary" : "secondary"}
+                    buttonType={isScrolledToEnd || isPending ? "primary" : "secondary"}
                     size="large" 
-                    disabled={loading || !isScrolledToEnd}
+                    disabled={isPending || !isScrolledToEnd}
                     onClick={handleSubmit}
                 >
-                    {loading ? "가입 중..." : "가입하기"}
+                    {isPending ? "가입 중..." : "가입하기"}
                 </Button>
             </div>
         </section>

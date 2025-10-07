@@ -4,6 +4,7 @@ import { flexCol } from "@/mixin/style";
 import { fetchCheckEmail } from "@/services/sign-up/check-email";
 import { useSignUpStore } from "@/store/signUp/SignUpStore";
 import { validateEmail } from "@/util/validation";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { Input } from "soridam-design-system";
 
@@ -17,34 +18,39 @@ export default function EmailSection({ onValidEmail }: EmailSectionProps) {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
+   // ✅ React Query Mutation
+    const { mutate: checkEmail, isPending } = useMutation({
+        mutationFn: (email: string) => fetchCheckEmail({ email }),
+        onSuccess: (data) => {
+            if (data.exists) {
+                setError("이미 등록된 이메일입니다.");
+                setSuccess("");
+            } else {
+                setError("");
+                setSuccess("사용 가능한 이메일입니다.");
+                onValidEmail(email);
+            }
+        },
+        onError: (err) => {
+            console.error(err);
+            setError(err instanceof Error ? err.message : "서버와 통신 중 오류가 발생했습니다.");
+            setSuccess("");
+        },
+    });
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(e.target.value);
-        setError(""); // 입력 중에는 에러 숨김
+        setError("");
+        setSuccess("");
     };
 
-    const handleBlur = async () => {
-        // 1️⃣ 로컬 유효성 검사
+    const handleBlur = () => {
         const validationError = validateEmail(email);
         setError(validationError ?? "");
         setSuccess("");
         if (validationError) return;
 
-        // 2️⃣ 서버 중복 확인
-        try {
-        const { exists } = await fetchCheckEmail({ email });
-        if (exists) {
-            setError("이미 등록된 이메일입니다.");
-            setSuccess("");
-        } else {
-            setError("");
-            setSuccess("사용 가능한 이메일입니다.");
-            onValidEmail(email); // 상위로 전달
-        }
-        } catch (err) {
-            console.error(err);
-            setError("서버와 통신 중 오류가 발생했습니다.");
-            setSuccess("");
-        }
+        checkEmail(email); // React Query Mutation 호출
     };
 
     return(
