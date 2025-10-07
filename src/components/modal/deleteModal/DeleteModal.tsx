@@ -5,8 +5,9 @@ import { Button, Modal } from "soridam-design-system";
 import { flexColCenter, flexRowCenter } from "@/mixin/style";
 import { useParams, useRouter } from "next/navigation";
 import { useToastStore } from "@/store/toast/useToastStore";
-import { DeleteMeasurementResponse } from "@/types/dto/deleteMeasurement";
+import { DeleteMeasurementResponse } from "@/types/dto/save/deleteMeasurement";
 import { deleteMeasurement } from "@/services/measurement/deleteMeasurement";
+import { useMutation } from "@tanstack/react-query";
 
 interface DeleteModalProps {
   isOpen: boolean;
@@ -22,21 +23,23 @@ export default function DeleteModal({
     const addToast = useToastStore((state) => state.addToast);
     const router = useRouter();
 
-    const handleDelete = async () => {
-        try {
-            const res: DeleteMeasurementResponse = await deleteMeasurement(listId);
+    // ✅ React Query mutation
+    const { mutate: deleteMutate, isPending } = useMutation({
+        mutationFn: () => deleteMeasurement(listId),
+        onSuccess: (res: DeleteMeasurementResponse) => {
             addToast(res.message || "삭제가 완료되었습니다.", 2000);
             onClose();
             router.push("/");
-        } catch (err) {
-            if (err instanceof Error) {
-                console.error(err);
-                addToast(err.message || "삭제 중 오류 발생", 2000);
-            } else {
-                console.error("예상치 못한 에러:", err);
-                addToast("삭제 중 알 수 없는 오류 발생", 2000);
-            }
-        }
+        },
+        onError: (err) => {
+            console.error(err);
+            if (err instanceof Error) addToast(err.message || "삭제 중 오류 발생", 2000);
+            else addToast("삭제 중 알 수 없는 오류 발생", 2000);
+        },
+    });
+
+    const handleDelete = () => {
+        deleteMutate();
     };
 
     return (
@@ -79,8 +82,9 @@ export default function DeleteModal({
                         buttonType="primary" 
                         size="xsmall"
                         onClick={handleDelete}
+                        disabled={isPending}
                     >
-                        삭제하기
+                        {isPending ? "삭제 중..." : "삭제하기"}
                     </Button>
                 </div>
             </div>

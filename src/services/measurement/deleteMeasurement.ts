@@ -1,4 +1,4 @@
-import { DeleteMeasurementResponse } from "@/types/dto/deleteMeasurement";
+import { DeleteMeasurementResponse } from "@/types/dto/save/deleteMeasurement";
 import { fetchWrapper } from "@/lib/fetchWrapper";
 
 export async function deleteMeasurement(
