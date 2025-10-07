@@ -1,7 +1,7 @@
 "use client";
 
 import { flexCol, flexRow, flexRowBetween, flexRowCenter } from "@/mixin/style";
-import { Measurement } from "@/types/dto/savelist";
+import { Measurement } from "@/types/dto/save/savelist";
 import { formatDateTime } from "@/util/formatDateTime";
 import { getDecibelLevel } from "@/util/getDecibelLevel";
 import Image from "next/image";
