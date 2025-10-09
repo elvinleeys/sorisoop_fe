@@ -1,4 +1,4 @@
-import { SignUpResponse } from "@/types/dto/SignUp";
+import { SignUpResponse } from "@/types/dto/sign-up/SignUp";
 
 export interface SignUpRequest {
   email: string;

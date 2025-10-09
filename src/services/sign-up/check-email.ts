@@ -1,4 +1,4 @@
-import { CheckEmailResponse } from "@/types/dto/CheckEmail";
+import { CheckEmailResponse } from "@/types/dto/sign-up/CheckEmail";
 
 export interface CheckEmailRequest {
   email: string;
