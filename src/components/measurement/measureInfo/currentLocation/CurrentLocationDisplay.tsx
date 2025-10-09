@@ -7,6 +7,7 @@ import { useCurrentLocation } from "@/hook/useCurrentLocation";
 import { fetchLocation } from "@/services/measurement/fetchLocation";
 import { useQuery } from "@tanstack/react-query";
 import { LocationResponse } from "@/types/dto/main/Location";
+import { useEffect } from "react";
 
 export default function CurrentLocationDisplay() {
   // store에서 location 상태와 setLocation 함수 가져오기
@@ -24,25 +25,29 @@ export default function CurrentLocationDisplay() {
     staleTime: 5 * 60 * 1000,
   });
 
-  if (isSuccess && data) {
-    setLocation({
-      kakaoPlaceId: data.kakaoPlaceId,
-      placeName: data.placeName,
-      location: data.location,
-      categoryCode: data.categoryCode,
-      categoryName: data.categoryName,
-    });
-  }
+  useEffect(() => {
+    if (isSuccess && data) {
+      setLocation({
+        kakaoPlaceId: data.kakaoPlaceId,
+        placeName: data.placeName,
+        location: data.location,
+        categoryCode: data.categoryCode,
+        categoryName: data.categoryName,
+      });
+    }
+  }, [isSuccess, data, setLocation]);
 
-  if (isError) {
-    setLocation({
-      kakaoPlaceId: null,
-      placeName: geoError ?? "위치 가져오기 실패",
-      location: { type: "Point", coordinates: null },
-      categoryCode: null,
-      categoryName: null,
-    });
-  }
+  useEffect(() => {
+    if (isError) {
+      setLocation({
+        kakaoPlaceId: null,
+        placeName: geoError ?? "위치 가져오기 실패",
+        location: { type: "Point", coordinates: null },
+        categoryCode: null,
+        categoryName: null,
+      });
+    }
+  }, [isError, geoError, setLocation]);
 
   return (
     <div
