@@ -54,8 +54,10 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
         comments: comments.map((c) => c.comment),
       },
     });
-  } catch (err: any) {
-    console.error("API error", err);
-    return NextResponse.json({ success: false, message: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      return NextResponse.json({ success: false, message: err.message }, { status: 500 });
+    }
+    return NextResponse.json({ success: false, message: "Unknown error" }, { status: 500 });
   }
 }
