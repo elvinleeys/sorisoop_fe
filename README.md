@@ -48,3 +48,8 @@
 
 ## 2025.10.05 및 2025.10.07
 - 각 서비스 화면의 ReactQuery 도입
+
+## 2025.10.09
+- 성능 평가 진행 후 `font-display: swap` 적용
+- 관련 설명: https://velog.io/@herjun802/lightHouse%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%9C-%EC%84%B1%EB%8A%A5-%ED%8F%89%EA%B0%80-%EB%B0%8F-font-display
+
