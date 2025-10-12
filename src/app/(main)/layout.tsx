@@ -1,9 +1,8 @@
-import { ReactNode } from 'react';
-import NavBar from '@/components/nav/NavBar';
 import PageTransition from '@/components/animate/pageTransition/PageTransition';
+import NavBar from '@/components/nav/NavBar';
 
 interface MainLayoutProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export default function MainLayout({ children } : MainLayoutProps) {

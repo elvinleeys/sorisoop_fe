@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import 'soridam-design-system/styles';
-import ToastContainer from "@/components/toast/ToastContainer";
-import UnifiedModalRenderer from "@/components/modal/UnifiedModalRenderer";
+import { ToastContainer, UnifiedModalRenderer } from './DynamicImport';
 import { Provider } from "./QueryClientProvider";
 
 export const metadata: Metadata = {

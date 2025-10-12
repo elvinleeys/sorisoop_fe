@@ -1,16 +1,14 @@
-import { ReactNode } from 'react';
-import PageTransition from '@/components/animate/pageTransition/PageTransition';
+import PageTransition from "@/components/animate/pageTransition/PageTransition";
+
 
 interface NoNavLayoutProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export default function NoNavLayout({ children } : NoNavLayoutProps) {
     return (
-        <>
-            <PageTransition>
-                {children}
-            </PageTransition>       
-        </>
+        <PageTransition>
+            {children}
+        </PageTransition>
     );
 }

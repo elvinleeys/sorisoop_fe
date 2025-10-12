@@ -1,7 +1,6 @@
-import FilterBottomSheet from "@/components/filterBottomSheet/FilterBottomSheet";
 import { MapHeader } from "@/components/header";
 import MapSection from "@/components/map/mapSection/MapSection";
-import PlaceDetailSheet from "@/components/placeDetailSheet/PlaceDetailSheet";
+import { FilterBottomSheet, PlaceDetailSheet } from "@/app/DynamicImport";
 
 export default function MapPage() {
 
