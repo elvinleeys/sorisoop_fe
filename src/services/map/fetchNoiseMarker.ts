@@ -34,7 +34,10 @@ export async function fetchNoiseMarkers({
   noiseLevels.forEach((n) => params.append("noiseLevels", n));
 
   const url = `/api/map?${params.toString()}`;
-  const res = await fetch(url, { signal });
+  const res = await fetch(url, { 
+    signal,
+    priority: 'high', 
+  });
 
   if (!res.ok) throw new Error("데이터 불러오기 실패");
 
