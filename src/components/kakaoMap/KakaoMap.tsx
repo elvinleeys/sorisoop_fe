@@ -173,28 +173,26 @@ export default function KakaoMap({
   /** props 변경 시 지도 갱신 */
   useEffect(() => {
     if (!window.kakao?.maps) return;
-
     if (!mapInstance.current) {
-      initMap();
+      initMap();  // 첫 로드시만 initMap을 호출
     } else {
-      updateMap();
+      updateMap(); // 이후에는 updateMap만 호출
     }
   }, [lat, lng, markers, level, isMapReady, initMap, updateMap]);
 
   return (
-    <div className="relative">
+    <div ref={mapRef} style={{ position: "relative", width: "100%", height, overflow: "hidden" }}>
       <Script
         src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_KEY}&libraries=services&autoload=false`}
-        strategy="afterInteractive"
         onLoad={initMap}
+        fetchPriority="high"
       />
-      <div ref={mapRef} style={{ width: "100%", height }} />
       {showLocateButton && onMoveToMyLocation && (
         <button
           className="absolute bottom-2 right-2 bg-white shadow-md rounded-full p-2 z-[10]"
           onClick={onMoveToMyLocation}
         >
-          <Image src="/icons/locate-ico.svg" alt="내 위치로 이동" width={24} height={24}/>
+          <Image src="/icons/locate-ico.svg" alt="내 위치로 이동" width={24} height={24} priority/>
         </button>
       )}
     </div>
