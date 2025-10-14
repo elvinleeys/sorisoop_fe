@@ -7,6 +7,7 @@ import { useMapLocationStore } from "@/store/map/useMapLocationStore";
 import { getMarkerImg } from "@/util/getDecibelLevel";
 import { fetchNoiseMarkers } from "@/services/map/fetchNoiseMarker";
 import { useQuery } from "@tanstack/react-query";
+import Loading from "@/components/loading/Loading";
 
 interface NoiseMarker {
   id: string;
@@ -79,8 +80,8 @@ export default function MapSection() {
   const mapLevel = getMapLevel(appliedRadius);
 
   if (error) return <div>위치 오류: {error}</div>;
-  if (!center) return <div>위치 불러오는 중...</div>;
-  if (isLoading) return <div>마커 불러오는 중...</div>;
+  if (!center) return <Loading text="내 위치 불러오는 중..." />;
+  if (isLoading) return <Loading text="마커 불러오는 중..." />;
   if (isError) return <div>마커 불러오기 실패</div>;
 
   console.log("Passing markers to KakaoMap:", markers);
