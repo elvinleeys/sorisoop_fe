@@ -1,12 +1,17 @@
-import { SaveHeader } from "@/components/header";
-import SideBar from "@/components/sideBar/SideBar";
 import { flexCol } from "@/mixin/style";
+import { SaveHeader } from "@/components/header";
+import { SideBar } from "@/app/DynamicImport";
+import SaveMainPage from "@/components/save/SaveMainPage";
 
 interface SaveLayoutProps {
-  children: React.ReactNode;
+  guest: React.ReactNode;
+  authenticated: React.ReactNode;
 }
 
-export default function SaveLayout({ children }: SaveLayoutProps) {
+export default  function SaveLayout({
+  guest,
+  authenticated,
+}: SaveLayoutProps) {
   return (
     <div className="bg-[#F5F5F5] min-h-screen">
         <SaveHeader />
@@ -22,7 +27,7 @@ export default function SaveLayout({ children }: SaveLayoutProps) {
                 overflow-y-scroll
             `}
         >
-            {children}
+          <SaveMainPage guest={guest} authenticated={authenticated} />
         </main>
         <div id="sidebar"></div>
         <SideBar />
