@@ -21,3 +21,10 @@ export const PlaceDetailSheet = dynamic(
   () => import("@/components/placeDetailSheet/PlaceDetailSheet"), 
   { ssr: false }
 );
+
+export const SideBar = dynamic(
+  () => import("@/components/sideBar/SideBar"), 
+  {
+    ssr: false,
+  }
+);
