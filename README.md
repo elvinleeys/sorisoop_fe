@@ -1,5 +1,1284 @@
 # 소리숲 Frontend
 
+## 프로젝트 소개
+Soridam 프로젝트는 측정된 소음데이터를 시각화하여 지도에서</br> 
+주변 장소의 소음 수준을 한 눈에 파악할 수 있는 플랫폼입니다.</br>
+
+Vercel : 클릭하여 페이지를 방문하세요
+
+Storybook : 클릭하여 페이지를 방문하세요
+
+Design-sytem 관련 repo : 
+
+## 프로젝트 일정
+### 1차 기간
+| **항목** | **기간** |
+|:----------:|:----------:|
+| 기획 아이디어 공유 | 2024.12.04 |
+| 배경조사, 문제 정의, 가설 설정 공유 | 2024.12.05 |
+| 기획 | 2024.12.08 ~ 2025.12.13 |
+| 해커톤(개발) | 2024.12.15 |
+| 보완 개발 | 2024.12.18 ~ 2025.03.11 |
+
+### 2차 기간(개인 프로젝트로 전환)
+- **Design-System 개발**
+| **항목** | **기간** |
+|:----------:|:----------:|
+| 개발 및 StoryBook을 활용한 문서화 | 2025.08.05 ~ 2025.08.26 |
+| CI/CD 구축 및 코드 수정 | 2025.08.27 ~ 2025.08.31 |
+| Chromatic 및 npm 패키로 배포 | 2025.09.01 |
+| Refactoring | 2025.09.01 ~ 현재 |
+
+- **본 프로젝트 개발**
+| **항목** | **기간** |
+|:----------:|:----------:|
+| 프로젝트 관련 boiler plate 작성 | 2025.09.02 |
+| 소음 측정 화면(main) 구현 | 2025.09.04 ~ 2025.09.09 |
+| 소음 데이터 등록 화면 구현 | 2025.09.09 ~ 2025.09.11 |
+| 소음 지도(map) 화면 구현 | 2025.09.11 ~ 2025.09.13 |
+| 소음 데이터 리스트 화면(save) 구현 | 2025.09.13 ~ 2025.09.15 |
+| 로그인 및 회원가입 구현 | 2025.09.15 ~ 2025.09.17 |
+| api 연동 | 2025.09.17 ~ 2025.09.29 |
+| Refactoring | 2025.09.29 ~ 현재 |
+
+
+## System Architecture
+
+<img src="./doc/Img/system-architecture.png" alt="system-architecture" />
+
+
+## 패키지 구조
+```bash
+.github               : Github action 관련 yml 파일
+    └─ workflows
+        └─ node.js.yml
+sorisoop_fe
+    ├─ src
+        ├─  app      
+            │    
+            ├─  (main)     : NavBar가 존재하는 페이지
+            │    └─ ...
+            ├─  (no-nav)     : NavBar가 존재하지 않는 페이지
+            │    └─ ...
+            ├─  api     : api route
+            │    └─ ...
+            ├─  DynamicImport.tsx     : dynamic import 명시
+            ├─  layout.tsx     : root Layout
+            ├─  not-found.tsx     : 404 page
+            └─  QueryClientProvider.tsx : React query Provider
+        ├─  components  : 컴포넌트
+                ├─  animate : animation 관련 컴포넌트
+                │    └─ ... 
+                ├─  clientOnlyPortal : Portal 관련
+                └─  header, modal, loading, ... etc
+        ├─  hook      : hook 함수
+        │     └─ ...
+        ├─  lib      : db, fetchWrapper 등
+        │    └─ ...
+        ├─  mixin       : 자주 사용되는 tailwind 변수 모음
+        │     └─ ...
+        ├─  model : DB Schema model
+        │      └─ ...
+        ├─  services : api fetch 함수
+        │      └─ ...
+        ├─  store : zustand store
+        │      └─ ...
+        ├─  types : dto 및 global.d.ts 모음
+        │     └─ ...
+        ├─  util : util 함수 모음
+        │     └─ ...
+    ├─ doc : ReadMe 관련 사용할 이미지/영상
+    │     └─ ...
+README.md             : 프로젝트 Readme
+```
+
+## 🧱 Database Schema (ERD)
+
+프로젝트는 MongoDB를 기반으로 하며, Mongoose 스키마를 통해 명시적으로 데이터 구조를 정의합니다.  
+다음은 주요 모델 간의 관계를 나타낸 ERD입니다.
+
+```mermaid
+erDiagram
+    USER {
+        ObjectId _id
+        string nickname
+        string email
+        string password
+        string profileImg
+        string refreshToken_token
+        date   refreshToken_expiredAt
+    }
+
+    PLACE {
+        ObjectId _id
+        string kakaoPlaceId
+        string placeName
+        string location_type
+        double[2] location_coordinates
+        string categoryCode
+        string categoryName
+    }
+
+    MEASUREMENT {
+        ObjectId _id
+        date measuredAt
+        string measuredDate
+        string timeSlot
+        number avgDecibel
+        number maxDecibel
+        string comment
+        ObjectId placeId
+        ObjectId userId
+    }
+
+    USER ||--o{ MEASUREMENT : "1:N"
+    PLACE ||--o{ MEASUREMENT : "1:N"
+```
+
+### ✅ 4️⃣ 핵심 요약 (README용 문장)
+
+> - `User`: 회원 정보 및 Refresh Token 관리  
+> - `Place`: KakaoMap 기반의 장소 정보 저장 (GeoJSON 좌표 포함)  
+> - `Measurement`: 사용자 및 장소를 참조하며, 시간대별 소음 측정 데이터를 기록  
+> - 관계:  
+>   - **User (1) → (N) Measurement**  
+>   - **Place (1) → (N) Measurement**
+
+
+## API 명세서
+1. Auth(user의 회원가입/로그인/로그아웃/회원탈퇴)
+- Base URL: /api/auth
+
+### 회원가입 (Sign Up)
+- **POST /api/auth/sign-up** (회원가입)
+
+- 요청 본문	
+```js
+{ 
+    "email": string, 
+    "password": string, 
+    "nickname": string 
+}
+```
+
+- 응답 코드	
+201 Created — 회원가입 성공</br>
+400 Bad Request — 필드 누락</br>
+409 Conflict — 이미 등록된 이메일</br>
+
+- 응답 예시	
+```js
+{
+  "message": "회원가입 성공",
+  "userId": "652a4a8dcb9e5b8e0c47b2a1"
+}
+```
+
+
+- **POST /api/auth/check-email** (이메일 중복 확인)
+- 요청 본문	
+```js
+{ "email": string }
+```
+
+- 응답 코드	
+200 OK</br> 
+400 Bad Request</br>
+
+- 응답 예시	
+```js
+{
+  "exists": false,
+  "message": "Email available"
+}
+```
+or
+
+```js
+{
+  "exists": true,
+  "message": "Email already registered"
+}
+```
+
+### 로그인 (Sign In)
+
+- **POST /api/auth/sign-in**
+- 요청 본문	
+```js
+{ 
+    "email": string, 
+    "password": string 
+}
+```
+
+- 응답 코드	
+200 OK — 로그인 성공</br>
+401 Unauthorized — 인증 실패</br>
+500 Internal Server Error — 서버 오류</br>
+
+- 응답 본문	
+```js
+{
+  "accessToken": "string..."
+}
+```
+
+### 로그아웃 (Logout)
+
+- **POST /api/auth/logout**
+- 요청 헤더	
+자동으로 refreshToken 쿠키 포함
+
+- 응답 코드	
+200 OK </br> 
+500 Internal Server Error</br>
+
+- 응답 예시	
+```js
+{
+  "message": "로그아웃 성공"
+}
+```
+
+### 회원 탈퇴 (Delete Account)
+- **DELETE /api/auth/delete**
+- 요청 헤더	
+자동으로 refreshToken 쿠키 포함
+
+- 응답 코드	
+200 OK — 탈퇴 성공</br>
+401 Unauthorized — 유효하지 않은 토큰</br>
+500 Internal Server Error — 서버 오류</br>
+
+- 응답 예시	
+```js
+{
+  "message": "회원 탈퇴가 완료되었습니다."
+}
+```
+
+2. Register(user의 소음데이터 측정 및 등록)
+### 위치 찾기(측정 화면)
+- **GET /api/location**
+- Request Parameters
+<table>
+    <thead>
+        <tr>
+            <td>
+                Name
+            </td>
+            <td>
+                Type
+            </td>
+            <td>
+                Required
+            </td>
+            <td>
+                Description
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                x
+            </td>
+            <td>
+                string
+            </td>
+            <td>
+                ✅
+            </td>
+            <td>
+                경도 (longitude)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                y
+            </td>
+            <td>
+                string
+            </td>
+            <td>
+                ✅
+            </td>
+            <td>
+                위도 (latitude)
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+- Response
+✅ 200 OK
+```js
+{
+  "kakaoPlaceId": "123456789",
+  "placeName": "스타벅스 강남역점",
+  "location": {
+    "type": "Point",
+    "coordinates": [127.027636, 37.497950]
+  },
+  "categoryCode": "CE7",
+  "categoryName": "카페"
+}
+```
+
+⚠️ 200 (Fallback - no place found)
+```js
+{
+  "kakaoPlaceId": null,
+  "placeName": "서초동 1303-37",
+  "location": {
+    "type": "Point",
+    "coordinates": [127.027636, 37.497950]
+  },
+  "categoryCode": null,
+  "categoryName": null
+}
+```
+
+❌ 400 Bad Request
+```js
+{
+  "error": "위도 또는 경도 값이 필요합니다."
+}
+```
+
+❌ 500 Server Error
+```js
+{
+  "error": "위치 정보를 가져오는 중 오류가 발생했습니다."
+}
+```
+
+### 소음 데이터 등록
+- **POST /api/register**
+- Request body
+<table>
+    <thead>
+        <tr>
+            <td>
+                Name
+            </td>
+            <td>
+                Type
+            </td>
+            <td>
+                Required
+            </td>
+            <td>
+                Description
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                placeName
+            </td>
+            <td>
+                string
+            </td>
+            <td>
+                ✅
+            </td>
+            <td>
+                장소명
+            </td>
+        </tr>
+        <tr>
+            <td>
+                kakaoPlaceId
+            </td>
+            <td>
+                string
+            </td>
+            <td>
+                ❌
+            </td>
+            <td>
+                카카오 장소 ID (없을 경우 null)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                location
+            </td>
+            <td>
+                { type: "Point"; coordinates: [number, number]; }
+            </td>
+            <td>
+                ✅
+            </td>
+            <td>
+                장소 좌표 정보
+            </td>
+        </tr>
+        <tr>
+            <td>
+                categoryCode
+            </td>
+            <td>
+                "CT1" | "AT4" | "FD6" | "CE7" | ""
+            </td>
+            <td>
+                ❌
+            </td>
+            <td>
+                장소 카테고리 코드
+            </td>
+        </tr>
+        <tr>
+            <td>
+                categoryName
+            </td>
+            <td>
+                "문화시설" | "관광명소" | "음식점" | "카페" | ""
+            </td>
+            <td>
+                ❌
+            </td>
+            <td>
+                장소 카테고리명
+            </td>
+        </tr>
+        <tr>
+            <td>
+                measuredAt
+            </td>
+            <td>
+                string (ISO Date)
+            </td>
+            <td>
+                ✅
+            </td>
+            <td>
+                측정 시각
+            </td>
+        </tr>
+        <tr>
+            <td>
+                measuredDate
+            </td>
+            <td>
+                string (YYYY-MM-DD)
+            </td>
+            <td>
+                ✅
+            </td>
+            <td>
+                측정 날짜
+            </td>
+        </tr>
+        <tr>
+            <td>
+                timeSlot
+            </td>
+            <td>
+                string
+            </td>
+            <td>
+                ✅
+            </td>
+            <td>
+                시간대 구분 (예: 오전, 오후 등)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                avgDecibel
+            </td>
+            <td>
+                number
+            </td>
+            <td>
+                ❌
+            </td>
+            <td>
+                평균 소음 (dB)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                maxDecibel
+            </td>
+            <td>
+                number
+            </td>
+            <td>
+                ❌
+            </td>
+            <td>
+                최대 소음 (dB)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                comment
+            </td>
+            <td>
+                number
+            </td>
+            <td>
+                ❌
+            </td>
+            <td>
+                사용자 코멘트
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+- Response
+✅ 201 Created
+```js
+{
+  "measurement": {
+    "_id": "672a8e3f73d2f94b3c2f8710",
+    "userId": "672a8d9f73d2f94b3c2f86ff",
+    "placeId": "672a8e1f73d2f94b3c2f870a",
+    "measuredAt": "2025-10-15T12:40:00.000Z",
+    "measuredDate": "2025-10-15",
+    "timeSlot": "오후",
+    "avgDecibel": 68.4,
+    "maxDecibel": 75.2,
+    "comment": "조용한 카페였음",
+    "__v": 0
+  }
+}
+```
+
+⚠️ 400 Bad Request
+```js
+{
+  "message": "필수 데이터가 누락되었습니다."
+}
+```
+
+❌ 401 Unauthorized
+```js
+{
+  "message": "인증되지 않은 사용자입니다."
+}
+```
+
+❌ 500 Server Error
+```js
+{
+  "message": "측정 데이터 저장 중 오류가 발생했습니다."
+}
+```
+
+3. Map(소음데이터 기반 kakaoMap 지도 시각화)
+### 주소 검색
+- **GET /api/kakao/search**
+- Request Parameters
+<table>
+    <thead>
+        <tr>
+            <td>
+                Name
+            </td>
+            <td>
+                Type
+            </td>
+            <td>
+                Required
+            </td>
+            <td>
+                Description
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                keyword
+            </td>
+            <td>
+                string
+            </td>
+            <td>
+                ✅
+            </td>
+            <td>
+                검색 키워드
+            </td>
+        </tr>
+        <tr>
+            <td>
+                lat
+            </td>
+            <td>
+                string
+            </td>
+            <td>
+                ✅
+            </td>
+            <td>
+                지도 중심의 위도
+            </td>
+        </tr>
+        <tr>
+            <td>
+                lng
+            </td>
+            <td>
+                string
+            </td>
+            <td>
+                ✅
+            </td>
+            <td>
+                지도 중심의 경도
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+- Response
+✅ 200 OK
+```js
+{
+  "documents": [
+    {
+      "id": "123456",
+      "place_name": "스타벅스 강남역점",
+      "x": "127.027636",
+      "y": "37.497950",
+      "address_name": "서울특별시 강남구 테헤란로 10",
+      "category_group_name": "카페"
+    }
+  ]
+}
+```
+
+❌ 400 Bad Request
+```js
+{
+  "error": "검색어를 입력해주세요."
+}
+```
+
+❌ 500 Server Error
+```js
+{
+  "error": "키워드 검색 중 오류가 발생했습니다."
+}
+```
+
+### 반경 내 장소 목록 및 평균 소음 데이터 조회
+- **GET /api/map**
+- Request Parameters
+<table>
+    <thead>
+        <tr>
+            <td>
+                Name
+            </td>
+            <td>
+                Type
+            </td>
+            <td>
+                Required
+            </td>
+            <td>
+                Description
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                x
+            </td>
+            <td>
+                number
+            </td>
+            <td>
+                ✅
+            </td>
+            <td>
+                중심 경도 (longitude)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                y
+            </td>
+            <td>
+                number
+            </td>
+            <td>
+                ✅
+            </td>
+            <td>
+                중심 위도 (latitude)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                radius
+            </td>
+            <td>
+                number
+            </td>
+            <td>
+                ❌
+            </td>
+            <td>
+                검색 반경 (m 단위, 기본값: 200)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                categories
+            </td>
+            <td>
+                string[]
+            </td>
+            <td>
+                ❌
+            </td>
+            <td>
+                카테고리 코드 배열 (CT1, AT4, FD6, CE7)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                noiseLevels
+            </td>
+            <td>
+                string[]
+            </td>
+            <td>
+                ❌
+            </td>
+            <td>
+                소음 단계 (quiet, moderate, loud)
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+- Response
+✅ 200 OK
+```js
+{
+  "success": true,
+  "data": [
+    {
+      "id": "671faac4721d30a9e05f8a11",
+      "lat": 37.49795,
+      "lng": 127.02763,
+      "avgDecibel": 68.4,
+      "placeName": "스타벅스 강남역점"
+    },
+    {
+      "id": "671faac4721d30a9e05f8a12",
+      "lat": 37.49812,
+      "lng": 127.02822,
+      "avgDecibel": 102.1,
+      "placeName": "강남대로 버스정류장"
+    }
+  ]
+}
+```
+
+⚠️ 400 Bad Request
+```js
+{
+  "success": false,
+  "error": "위도/경도 필요"
+}
+```
+
+❌ 500 Server Error
+```js
+{
+  "success": false,
+  "error": "데이터 조회 실패"
+}
+```
+
+### 특정 장소에 대한 시간대별 평균 소음 데이터 및 최근 코멘트 목록 조회
+- **GET /api/map/place-detail/[id]**
+- Path Parameter
+<table>
+    <thead>
+        <tr>
+            <td>
+                Name
+            </td>
+            <td>
+                Type
+            </td>
+            <td>
+                Required
+            </td>
+            <td>
+                Description
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                id
+            </td>
+            <td>
+                string
+            </td>
+            <td>
+                ✅
+            </td>
+            <td>
+                장소 ObjectId
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+- Response
+✅ 200 OK
+```js
+{
+  "success": true,
+  "data": {
+    "placeName": "스타벅스 강남역점",
+    "chart": [
+      { "timeRange": "5-11", "db": 65, "count": 10 },
+      { "timeRange": "11-18", "db": 72, "count": 20 },
+      { "timeRange": "18-22", "db": 78, "count": 15 }
+    ],
+    "comments": [
+      "아침에는 조용했어요.",
+      "점심 피크타임엔 꽤 시끄러움.",
+      "저녁은 여유로웠습니다."
+    ]
+  }
+}
+```
+
+❌ 500 Server Error
+```js
+{
+  "success": false,
+  "message": "서버에서 알 수 없는 오류가 발생했습니다."
+}
+```
+
+4. Save(측정된 소음 데이터 리스트 및 상세 내용 조회/삭제)
+### 사용자의 소음 측정 기록 목록 조회
+- **GET /api/get-list**
+- Request(header)
+<table>
+    <thead>
+        <tr>
+            <td>
+                Key
+            </td>
+            <td>
+                Type
+            </td>
+            <td>
+                Required
+            </td>
+            <td>
+                Description
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                Authorization
+            </td>
+            <td>
+                string
+            </td>
+            <td>
+                ✅
+            </td>
+            <td>
+                Bearer {accessToken} 형식
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Cookie
+            </td>
+            <td>
+                string
+            </td>
+            <td>
+                ✅
+            </td>
+            <td>
+                refreshToken 포함
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+- Response
+✅ 성공 (200)
+```js
+[
+  {
+    "id": "671aef1f91a5b3aef5b2a9f1",
+    "avgDecibel": 75.3,
+    "maxDecibel": 102.1,
+    "measuredAt": "2025-10-12T14:32:00Z",
+    "placeName": "홍대입구역 2번 출구"
+  }
+]
+```
+
+❌ 실패
+<table>
+    <thead>
+        <tr>
+            <td>
+                Status
+            </td>
+            <td>
+                Message
+            </td>
+            <td>
+                설명
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                401
+            </td>
+            <td>
+                "인증 실패"
+            </td>
+            <td>
+                토큰이 없거나 만료됨
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+### 특정 측정 데이터의 상세 정보 조회
+- **GET /api/get-measurement/[id]**
+- **Request**
+(1) path Parameter</br>
+<table>
+    <thead>
+        <tr>
+            <td>
+                Key
+            </td>
+            <td>
+                Type
+            </td>
+            <td>
+                Required
+            </td>
+            <td>
+                Description
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                id
+            </td>
+            <td>
+                string
+            </td>
+            <td>
+                ✅
+            </td>
+            <td>
+                조회할 측정 데이터 ID
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+(2) Headers</br>
+<table>
+    <thead>
+        <tr>
+            <td>
+                Key
+            </td>
+            <td>
+                Type
+            </td>
+            <td>
+                Required
+            </td>
+            <td>
+                Description
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                Authorization
+            </td>
+            <td>
+                string
+            </td>
+            <td>
+                ✅
+            </td>
+            <td>
+                Bearer {accessToken} 형식
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Cookie
+            </td>
+            <td>
+                string
+            </td>
+            <td>
+                ✅
+            </td>
+            <td>
+                refreshToken 포함
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+- Response
+✅ 성공 (200)
+```js
+{
+  "id": "671aef1f91a5b3aef5b2a9f1",
+  "avgDecibel": 72.5,
+  "maxDecibel": 95.4,
+  "measuredAt": "2025-10-13T12:21:00Z",
+  "comment": "버스 정류장이 생각보다 조용함",
+  "place": {
+    "id": "671aef0f91a5b3aef5b2a9d8",
+    "placeName": "강남역 10번 출구",
+    "location": { "type": "Point", "coordinates": [127.0276, 37.4979] },
+    "categoryCode": "CE7",
+    "categoryName": "카페"
+  }
+}
+```
+
+❌ 실패
+<table>
+    <thead>
+        <tr>
+            <td>
+                Status
+            </td>
+            <td>
+                Message
+            </td>
+            <td>
+                설명
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                401
+            </td>
+            <td>
+                "인증 실패"
+            </td>
+            <td>
+                토큰이 유효하지 않음
+            </td>
+        </tr>
+        <tr>
+            <td>
+                404
+            </td>
+            <td>
+                "데이터 없음"
+            </td>
+            <td>
+                사용자의 데이터가 아님 또는 존재하지 않음
+            </td>
+        </tr>
+        <tr>
+            <td>
+                500
+            </td>
+            <td>
+                "서버 에러"
+            </td>
+            <td>
+                내부 처리 실패
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+### 특정 소음 측정 데이터 삭제
+- **DELETE /api/delete-measurement/[id]**
+- Request
+(1) path Parameter</br>
+<table>
+    <thead>
+        <tr>
+            <td>
+                Key
+            </td>
+            <td>
+                Type
+            </td>
+            <td>
+                Required
+            </td>
+            <td>
+                Description
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                id
+            </td>
+            <td>
+                string
+            </td>
+            <td>
+                ✅
+            </td>
+            <td>
+                삭제할 측정 데이터 ID
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+(2) Headers</br>
+<table>
+    <thead>
+        <tr>
+            <td>
+                Key
+            </td>
+            <td>
+                Type
+            </td>
+            <td>
+                Required
+            </td>
+            <td>
+                Description
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                Authorization
+            </td>
+            <td>
+                string
+            </td>
+            <td>
+                ✅
+            </td>
+            <td>
+                Bearer {accessToken} 형식
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Cookie
+            </td>
+            <td>
+                string
+            </td>
+            <td>
+                ✅
+            </td>
+            <td>
+                refreshToken 포함
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+- Response
+✅ 성공 (200)
+```js
+{
+  "success": true,
+  "message": "삭제 성공"
+}
+```
+
+❌ 실패
+<table>
+    <thead>
+        <tr>
+            <td>
+                Status
+            </td>
+            <td>
+                Message
+            </td>
+            <td>
+                설명
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                401
+            </td>
+            <td>
+                "인증 실패"
+            </td>
+            <td>
+                유효하지 않은 토큰
+            </td>
+        </tr>
+        <tr>
+            <td>
+                404
+            </td>
+            <td>
+                "삭제할 데이터를 찾을 수 없음"
+            </td>
+            <td>
+                본인 데이터가 아님
+            </td>
+        </tr>
+        <tr>
+            <td>
+                500
+            </td>
+            <td>
+                "서버 에러"
+            </td>
+            <td>
+                내부 처리 실패
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+
 ## 🛠 Tech Stack
 
 ### Languages
@@ -9,7 +1288,12 @@
 ### Frameworks
 ![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat&logo=next.js&logoColor=white)
 ![React](https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=black)
+
+### CSS
 ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat&logo=tailwind-css&logoColor=white)
+
+### Design-System
+![soridam-design-system](https://img.shields.io/badge/soridam--design--system-FF66CC?style=flat&logoColor=white)
 
 ### Libraries
 ![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=flat&logo=framer&logoColor=white)
@@ -18,10 +1302,8 @@
 ![bcrypt](https://img.shields.io/badge/bcrypt-000000?style=flat&logoColor=white)
 ![jsonwebtoken](https://img.shields.io/badge/jsonwebtoken-000000?style=flat&logoColor=white)
 ![Mongoose](https://img.shields.io/badge/Mongoose-880000?style=flat&logo=mongoose&logoColor=white)
-![soridam-design-system](https://img.shields.io/badge/soridam--design--system-FF66CC?style=flat&logoColor=white)
 
 ### Tools
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)
 ![ESLint](https://img.shields.io/badge/ESLint-4B32C3?style=flat&logo=eslint&logoColor=white)
 ![npm](https://img.shields.io/badge/npm-CB3837?style=flat&logo=npm&logoColor=white)
 ![Cross-env](https://img.shields.io/badge/cross--env-000000?style=flat&logoColor=white)
@@ -93,3 +1375,9 @@
 - sideBar에 대한 dynamic import 적용
 - /save 경로에 대한 기존 SaveMain컴포넌트에서 로그인 유저인지 data가 존재하는지에 따라 조건부랜더링으로 보여주었다면 accessToken을 활용해 parallel 구조로 변경
 - Loading 컴포넌트 도입
+
+### 2025.10.15
+- Image svg형식에서 webp 형식으로 전환
+
+### 2025.10.16
+- favicon 및 meta 정보 추가
