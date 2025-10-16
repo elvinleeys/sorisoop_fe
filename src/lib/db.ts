@@ -5,7 +5,7 @@ interface Cached {
   promise: Promise<Mongoose> | null;
 }
 
-const MONGODB_URI = process.env.MONGODB_URI!;
+const MONGODB_URI = process.env.MONGODB_URI || '';
 
 if (!MONGODB_URI) {
   throw new Error(".env.local에 MONGODB_URI를 설정해주세요.");
