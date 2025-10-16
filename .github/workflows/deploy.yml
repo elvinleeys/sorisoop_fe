@@ -38,5 +38,5 @@ jobs:
           ACCESS_TOKEN_EXPIRES: ${{ secrets.ACCESS_TOKEN_EXPIRES }}
           REFRESH_TOKEN_EXPIRES_DAYS: ${{ secrets.REFRESH_TOKEN_EXPIRES_DAYS }} 
           KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
-          KAKAO_MAP_KEY: ${{ secrets.KAKAO_MAP_KEY }}
+          KAKAO_MAP_KEY: ${{ secrets.NEXT_PUBLIC_KAKAO_MAP_KEY }}
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
