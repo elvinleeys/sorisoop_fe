@@ -183,7 +183,7 @@ export default function KakaoMap({
   return (
     <div ref={mapRef} style={{ position: "relative", width: "100%", height, overflow: "hidden" }}>
       <Script
-        src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_KEY}&libraries=services&autoload=false`}
+        src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.KAKAO_MAP_KEY}&libraries=services&autoload=false`}
         onLoad={initMap}
         fetchPriority="high"
       />
