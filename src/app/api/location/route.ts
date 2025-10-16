@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
 
     if (!placeRes.ok) {
       const errorBody = await placeRes.text();
-      console.log("❌ 카카오 API 응답 실패:", placeRes.status, errorBody);
+      // console.log("❌ 카카오 API 응답 실패:", placeRes.status, errorBody);
       // 카카오 API의 응답 실패를 클라이언트에 400 에러로 전달
       return NextResponse.json({ error: '주변 장소 검색 실패' }, { status: 400 });
     }

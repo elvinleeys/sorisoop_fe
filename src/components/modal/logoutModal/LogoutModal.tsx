@@ -23,7 +23,7 @@ export default function LogoutModal({
     const { mutate: logoutMutate, isPending } = useMutation({
         mutationFn: logoutRequest,
         onSuccess: (res) => {
-            console.log(res.message);
+            // console.log(res.message);
             setAccessToken(null);
             onClose();
             router.push("/");

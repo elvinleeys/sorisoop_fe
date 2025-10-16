@@ -8,7 +8,7 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
   try {
     await dbConnect();
     const { id } = await context.params;
-    console.log("id", id)
+    // console.log("id", id)
 
     // 2️⃣ string → ObjectId 변환
     const placeObjectId = new mongoose.Types.ObjectId(id);
@@ -25,7 +25,7 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
       },
       { $sort: { _id: 1 } },
     ]);
-    console.log("grouped", grouped);
+    // console.log("grouped", grouped);
 
     // ✅ 한줄평도 오늘 제한 제거 → 장소 전체 코멘트
     const comments = await Measurement.find(

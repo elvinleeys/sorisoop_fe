@@ -84,7 +84,7 @@ export default function MapSection() {
   if (isLoading) return <Loading text="마커 불러오는 중..." />;
   if (isError) return <div>마커 불러오기 실패</div>;
 
-  console.log("Passing markers to KakaoMap:", markers);
+  // console.log("Passing markers to KakaoMap:", markers);
 
   return (
     center && (

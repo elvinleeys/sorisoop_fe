@@ -24,7 +24,7 @@ export default function DeleteAccountModal({
     const { mutate: deleteMutate, isPending, error } = useMutation({
         mutationFn: deleteAccountRequest,
         onSuccess: (data) => {
-            console.log(data.message); // 타입 안전하게 접근 가능
+            // console.log(data.message); // 타입 안전하게 접근 가능
             setAccessToken(null);
             onClose();
             router.push("/");

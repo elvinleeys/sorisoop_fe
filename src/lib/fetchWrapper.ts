@@ -29,6 +29,5 @@ export async function fetchWrapper<T>(
         throw new Error(error.message || "API 요청 실패");
     }
 
-    console.log("x-access-token:", res.headers.get("x-access-token"));
     return res.json() as Promise<T>;
 }
