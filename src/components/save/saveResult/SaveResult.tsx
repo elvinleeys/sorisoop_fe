@@ -71,7 +71,7 @@ export default function SaveResult({
                             </div>
                         </div>
                         <div className="w-12 h-12 relative">
-                            <Image src="/icons/next-ico.svg" alt="이동 버튼" fill priority />
+                            <Image src="/icons/next-ico.webp" alt="이동 버튼" fill priority />
                         </div>
                     </div>
                     <div className={`${flexRow} gap-2`}>

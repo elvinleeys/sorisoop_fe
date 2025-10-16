@@ -61,7 +61,7 @@ export default function CurrentLocationDisplay() {
       `}
     >
       <div className="relative w-[1.25rem] h-[1.25rem]">
-        <Image src="/icons/locate-ico.svg" alt="현재 위치 아이콘" fill priority />
+        <Image src="/icons/locate-ico.webp" alt="현재 위치 아이콘" fill priority />
       </div>
       <p
         className="

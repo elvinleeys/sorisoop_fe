@@ -151,7 +151,7 @@ export default function KakaoMap({
     // 내 위치 마커
     if (showMyLocation) {
       const icon = new window.kakao.maps.MarkerImage(
-        "/icons/my-location-arrow.svg",
+        "/icons/my-location-arrow-ico.webp",
         new window.kakao.maps.Size(18, 18),
         { anchor: new window.kakao.maps.Point(12, 12) }
       );
@@ -192,7 +192,7 @@ export default function KakaoMap({
           className="absolute bottom-2 right-2 bg-white shadow-md rounded-full p-2 z-[10]"
           onClick={onMoveToMyLocation}
         >
-          <Image src="/icons/locate-ico.svg" alt="내 위치로 이동" width={24} height={24} priority/>
+          <Image src="/icons/locate-ico.webp" alt="내 위치로 이동" width={24} height={24} priority/>
         </button>
       )}
     </div>

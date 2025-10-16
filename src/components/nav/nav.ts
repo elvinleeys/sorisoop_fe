@@ -1,20 +1,20 @@
 // NavItem 기본 이미지 데이터
 const measureImg = {
-  icon: '/icons/nav/ico_measure_inactive.svg',
+  icon: '/icons/nav/ico_measure_inactive.webp',
   iconLabel: '소음 측정',
-  activeIcon: '/icons/nav/ico_measure_active.svg',
+  activeIcon: '/icons/nav/ico_measure_active.webp',
 };
 
 const mapImg = {
-  icon: '/icons/nav/ico_map_inactive.svg',
+  icon: '/icons/nav/ico_map_inactive.webp',
   iconLabel: '소음 지도',
-  activeIcon: '/icons/nav/ico_map_active.svg',
+  activeIcon: '/icons/nav/ico_map_active.webp',
 };
 
 const saveImg = {
-  icon: '/icons/nav/ico_save_inactive.svg',
+  icon: '/icons/nav/ico_save_inactive.webp',
   iconLabel: '저장',
-  activeIcon: '/icons/nav/ico_save_active.svg',
+  activeIcon: '/icons/nav/ico_save_active.webp',
 };
 
 // NavList 아이템 예제

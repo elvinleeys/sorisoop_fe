@@ -18,8 +18,8 @@ export function getMarkerImg(avgDecibel: number | null): string;
 export function getMarkerImg(db: number): string;
 
 export function getMarkerImg(avgDecibel: number | null): string {
-  if (avgDecibel === null) return "/icons/default.svg"; // 소음 데이터 없는 경우 기본 마커
-  if (avgDecibel >= 100) return '/icons/loud.svg';
-  if (avgDecibel >= 70) return '/icons/moderate.svg'; // 70 <= db < 100
-  return '/icons/quiet.svg'; // db < 70
+  if (avgDecibel === null) return "/icons/decibel/default.webp"; // 소음 데이터 없는 경우 기본 마커
+  if (avgDecibel >= 100) return '/icons/decibel/loud.webp';
+  if (avgDecibel >= 70) return '/icons/decibel/moderate.webp'; // 70 <= db < 100
+  return '/icons/decibel/quiet.webp'; // db < 70
 }

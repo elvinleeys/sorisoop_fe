@@ -7,17 +7,17 @@ export interface DecibelOption {
 export const options: DecibelOption[] = [
     { 
         label: "0~70dB (조용함)", 
-        iconSrc: "/icons/filter/decibel/quiet.svg", 
+        iconSrc: "/icons/decibel/quiet.webp", 
         decibelLv: "quiet" 
     },
     { 
         label: "70~100dB (보통)", 
-        iconSrc: "/icons/filter/decibel/moderate.svg", 
+        iconSrc: "/icons/decibel/moderate.webp", 
         decibelLv: "moderate" 
     },
     { 
         label: "100~120dB (시끄러움)", 
-        iconSrc: "/icons/filter/decibel/loud.svg", 
+        iconSrc: "/icons/decibel/loud.webp", 
         decibelLv: "loud" 
     },
 ];

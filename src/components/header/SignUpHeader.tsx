@@ -3,7 +3,7 @@
 import { flexRowBetween } from "@/mixin/style";
 import { useSignUpStore } from "@/store/signUp/SignUpStore";
 import { usePathname, useRouter } from "next/navigation";
-import { BackButton } from "soridam-design-system";
+import { SBackButton } from "soridam-design-system";
 
 const stepMap: Record<string, string | null> = {
   "/sign-up": null,
@@ -37,7 +37,7 @@ export default function SignUpHeader() {
                 pl-4 
             `}
         >
-            <BackButton onClick={handleBack} size="md"/>
+            <SBackButton onClick={handleBack} size="md"/>
             <h2 className="text-lg leading-[0.5] text-neutral-black">
                 회원가입
             </h2>

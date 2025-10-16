@@ -22,7 +22,7 @@ export default function CategorySection({onClose}: {onClose: () => void}) {
           </p>
         </div>
         <button onClick={onClose} className="w-8 h-8 relative">
-          <Image src="/icons/filter/close.svg" alt="close button" fill />
+          <Image src="/icons/filter/close-ico.webp" alt="close button" fill />
         </button>
       </div>
 

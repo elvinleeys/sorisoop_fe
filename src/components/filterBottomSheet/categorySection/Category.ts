@@ -4,10 +4,10 @@ export interface CategoryOption {
 }
 
 export const options: CategoryOption[] = [
-  { label: "카페", iconSrc: "/icons/filter/category/cafe.svg" },
-  { label: "음식점", iconSrc: "/icons/filter/category/cutlery.svg" },
-  { label: "문화시설", iconSrc: "/icons/filter/category/culture.svg" },
-  { label: "관광명소", iconSrc: "/icons/filter/category/tour.svg" },
+  { label: "카페", iconSrc: "/icons/filter/category/cafe-ico.webp" },
+  { label: "음식점", iconSrc: "/icons/filter/category/cutlery-ico.webp" },
+  { label: "문화시설", iconSrc: "/icons/filter/category/culture-ico.webp" },
+  { label: "관광명소", iconSrc: "/icons/filter/category/tour-ico.webp" },
 ];
 
 // 한글 라벨 → Category 타입 매핑

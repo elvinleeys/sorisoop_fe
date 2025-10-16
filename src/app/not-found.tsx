@@ -17,7 +17,7 @@ export default function NotFound() {
             `}
         >
             <figure className="w-49 h-23 mb-6.5 relative">
-                <Image src="/icons/error-ico.svg" alt="404 에러 아이콘" fill priority />
+                <Image src="/icons/error-ico.webp" alt="404 에러 아이콘" fill priority />
             </figure>
             <section className={`${flexCol} items-center mb-47.5 text-center`}>
                 <p className="text-base text-neutral-black">
