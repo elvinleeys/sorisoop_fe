@@ -15,8 +15,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: "/icons/logo.webp",
-        width: 1200,
-        height: 630,
+        width: 800,
+        height: 400,
         alt: "SORIDAM Logo",
       },
     ],
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     images: ["/icons/logo.webp"],
   },
   // 배포 시 아래 추가
-  // metadataBase: new URL("https://soridam.site"),
+  metadataBase: new URL("https://soridam-one.vercel.app"),
 };
 
 export default function RootLayout({ 

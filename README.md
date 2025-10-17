@@ -1,17 +1,28 @@
 # 소리숲 Frontend
 
-## 프로젝트 소개
-Soridam 프로젝트는 측정된 소음데이터를 시각화하여 지도에서</br> 
-주변 장소의 소음 수준을 한 눈에 파악할 수 있는 플랫폼입니다.</br>
+## 🚀 목차
 
-Vercel : 클릭하여 페이지를 방문하세요
+- [1. 프로젝트 소개](#-프로젝트-소개)
+- [2. 프로젝트 일정](#-프로젝트-일정)
+- [3. 시스템 아키텍쳐](#-System-Architecture)
+- [4. 패키지 구조](#-패키지-구조)
+- [5. 데이터 구조(Schema)](#-Database-Schema)
+- [6. API 명세서](#-API-명세서)
+- [7. 기술 스택](#-Tech-Stack)
+- [8. 개선 사항](#개선-사항)
 
-Storybook : 클릭하여 페이지를 방문하세요
 
-Design-sytem 관련 repo : 
+## 📜 프로젝트 소개
+**Soridam 프로젝트**는 측정된 소음 데이터를 시각화하여 지도에서 주변 장소의 소음 수준을 한 눈에 파악할 수 있는 플랫폼입니다.  
+- **Vercel**: [https://soridam-one.vercel.app/](https://soridam-one.vercel.app/)  
+- **Storybook**: [https://68b18c520a82ac63f9524bc5-rueqmotjmh.chromatic.com/?path=/docs/configure-your-project--docs](https://68b18c520a82ac63f9524bc5-rueqmotjmh.chromatic.com/?path=/docs/configure-your-project--docs)  
+- **Design-system 관련 repo**: [https://github.com/elvinleeys/soridam_storybook?tab=readme-ov-file](https://github.com/elvinleeys/soridam_storybook?tab=readme-ov-file)
 
-## 프로젝트 일정
+[맨 위로](#-목차)
+
+## 📅 프로젝트 일정
 ### 1차 기간
+
 | **항목** | **기간** |
 |:----------:|:----------:|
 | 기획 아이디어 공유 | 2024.12.04 |
@@ -22,6 +33,7 @@ Design-sytem 관련 repo :
 
 ### 2차 기간(개인 프로젝트로 전환)
 - **Design-System 개발**
+
 | **항목** | **기간** |
 |:----------:|:----------:|
 | 개발 및 StoryBook을 활용한 문서화 | 2025.08.05 ~ 2025.08.26 |
@@ -30,6 +42,7 @@ Design-sytem 관련 repo :
 | Refactoring | 2025.09.01 ~ 현재 |
 
 - **본 프로젝트 개발**
+
 | **항목** | **기간** |
 |:----------:|:----------:|
 | 프로젝트 관련 boiler plate 작성 | 2025.09.02 |
@@ -41,58 +54,47 @@ Design-sytem 관련 repo :
 | api 연동 | 2025.09.17 ~ 2025.09.29 |
 | Refactoring | 2025.09.29 ~ 현재 |
 
+[맨 위로](#-목차)
 
-## System Architecture
+## 🖥 System Architecture
 
 <img src="./doc/Img/system-architecture.png" alt="system-architecture" />
 
 
-## 패키지 구조
+## 📁 패키지 구조
 ```bash
-.github               : Github action 관련 yml 파일
-    └─ workflows
-        └─ node.js.yml
+.github                   : Github action 관련 yml 파일
+└─ workflows
+   └─ node.js.yml
 sorisoop_fe
-    ├─ src
-        ├─  app      
-            │    
-            ├─  (main)     : NavBar가 존재하는 페이지
-            │    └─ ...
-            ├─  (no-nav)     : NavBar가 존재하지 않는 페이지
-            │    └─ ...
-            ├─  api     : api route
-            │    └─ ...
-            ├─  DynamicImport.tsx     : dynamic import 명시
-            ├─  layout.tsx     : root Layout
-            ├─  not-found.tsx     : 404 page
-            └─  QueryClientProvider.tsx : React query Provider
-        ├─  components  : 컴포넌트
-                ├─  animate : animation 관련 컴포넌트
-                │    └─ ... 
-                ├─  clientOnlyPortal : Portal 관련
-                └─  header, modal, loading, ... etc
-        ├─  hook      : hook 함수
-        │     └─ ...
-        ├─  lib      : db, fetchWrapper 등
-        │    └─ ...
-        ├─  mixin       : 자주 사용되는 tailwind 변수 모음
-        │     └─ ...
-        ├─  model : DB Schema model
-        │      └─ ...
-        ├─  services : api fetch 함수
-        │      └─ ...
-        ├─  store : zustand store
-        │      └─ ...
-        ├─  types : dto 및 global.d.ts 모음
-        │     └─ ...
-        ├─  util : util 함수 모음
-        │     └─ ...
-    ├─ doc : ReadMe 관련 사용할 이미지/영상
-    │     └─ ...
-README.md             : 프로젝트 Readme
+├─ src
+│  ├─ app
+│  │  ├─ (main)        : NavBar가 존재하는 페이지
+│  │  └─ (no-nav)     : NavBar가 존재하지 않는 페이지
+│  ├─ api              : API route
+│  ├─ DynamicImport.tsx : dynamic import 명시
+│  ├─ layout.tsx       : root Layout
+│  ├─ not-found.tsx    : 404 페이지
+│  └─ QueryClientProvider.tsx : React Query Provider
+├─ components         : 컴포넌트
+│  ├─ animate         : 애니메이션 관련 컴포넌트
+│  ├─ clientOnlyPortal : Portal 관련
+│  ├─ header, modal, loading, ...
+├─ hook               : hook 함수
+├─ lib                : db, fetchWrapper 등
+├─ mixin              : 자주 사용되는 tailwind 변수 모음
+├─ model              : DB Schema model
+├─ services           : API fetch 함수
+├─ store              : zustand store
+├─ types              : DTO 및 global.d.ts 모음
+├─ util               : 유틸 함수 모음
+├─ doc                : ReadMe 관련 사용할 이미지/영상
+├─ README.md          : 프로젝트 ReadMe
 ```
 
-## 🧱 Database Schema (ERD)
+[맨 위로](#-목차)
+
+## 🧱 Database Schema
 
 프로젝트는 MongoDB를 기반으로 하며, Mongoose 스키마를 통해 명시적으로 데이터 구조를 정의합니다.  
 다음은 주요 모델 간의 관계를 나타낸 ERD입니다.
@@ -144,8 +146,9 @@ erDiagram
 >   - **User (1) → (N) Measurement**  
 >   - **Place (1) → (N) Measurement**
 
+[맨 위로](#-목차)
 
-## API 명세서
+## 📝 API 명세서
 1. Auth(user의 회원가입/로그인/로그아웃/회원탈퇴)
 - Base URL: /api/auth
 
@@ -224,6 +227,8 @@ or
 }
 ```
 
+[맨 위로](#-목차)
+
 ### 로그아웃 (Logout)
 
 - **POST /api/auth/logout**
@@ -241,6 +246,8 @@ or
 }
 ```
 
+[맨 위로](#-목차)
+
 ### 회원 탈퇴 (Delete Account)
 - **DELETE /api/auth/delete**
 - 요청 헤더	
@@ -257,6 +264,8 @@ or
   "message": "회원 탈퇴가 완료되었습니다."
 }
 ```
+
+[맨 위로](#-목차)
 
 2. Register(user의 소음데이터 측정 및 등록)
 ### 위치 찾기(측정 화면)
@@ -353,6 +362,8 @@ or
   "error": "위치 정보를 가져오는 중 오류가 발생했습니다."
 }
 ```
+
+[맨 위로](#-목차)
 
 ### 소음 데이터 등록
 - **POST /api/register**
@@ -572,6 +583,8 @@ or
 }
 ```
 
+[맨 위로](#-목차)
+
 3. Map(소음데이터 기반 kakaoMap 지도 시각화)
 ### 주소 검색
 - **GET /api/kakao/search**
@@ -669,6 +682,8 @@ or
   "error": "키워드 검색 중 오류가 발생했습니다."
 }
 ```
+
+[맨 위로](#-목차)
 
 ### 반경 내 장소 목록 및 평균 소음 데이터 조회
 - **GET /api/map**
@@ -804,6 +819,8 @@ or
 }
 ```
 
+[맨 위로](#-목차)
+
 ### 특정 장소에 대한 시간대별 평균 소음 데이터 및 최근 코멘트 목록 조회
 - **GET /api/map/place-detail/[id]**
 - Path Parameter
@@ -870,6 +887,8 @@ or
   "message": "서버에서 알 수 없는 오류가 발생했습니다."
 }
 ```
+
+[맨 위로](#-목차)
 
 4. Save(측정된 소음 데이터 리스트 및 상세 내용 조회/삭제)
 ### 사용자의 소음 측정 기록 목록 조회
@@ -967,6 +986,8 @@ or
         </tr>
     </tbody>
 </table>
+
+[맨 위로](#-목차)
 
 ### 특정 측정 데이터의 상세 정보 조회
 - **GET /api/get-measurement/[id]**
@@ -1128,6 +1149,8 @@ or
     </tbody>
 </table>
 
+[맨 위로](#-목차)
+
 ### 특정 소음 측정 데이터 삭제
 - **DELETE /api/delete-measurement/[id]**
 - Request
@@ -1278,6 +1301,7 @@ or
     </tbody>
 </table>
 
+[맨 위로](#-목차)
 
 ## 🛠 Tech Stack
 
@@ -1308,6 +1332,8 @@ or
 ![npm](https://img.shields.io/badge/npm-CB3837?style=flat&logo=npm&logoColor=white)
 ![Cross-env](https://img.shields.io/badge/cross--env-000000?style=flat&logoColor=white)
 
+
+[맨 위로](#-목차)
 
 ## 개선 사항
 ### 2025.09.29
@@ -1381,3 +1407,5 @@ or
 
 ### 2025.10.16
 - favicon 및 meta 정보 추가
+
+[맨 위로](#-목차)
