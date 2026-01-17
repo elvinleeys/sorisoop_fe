@@ -16,10 +16,10 @@
     "framer-motion": "^12.23.12",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.1",
-    "next": "15.5.2",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "soridam-design-system": "^0.1.19",
+    "next": "^16.1.1",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "soridam-design-system": "^0.1.36",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
