@@ -3,34 +3,33 @@
 import React from "react";
 import { Button, Modal } from "soridam-design-system";
 import { flexColCenter, flexRowCenter } from "@/mixin/style";
-import { useMeasurementStore } from "@/store/measurement/measurementStore";
 import { useRouter } from "next/navigation";
 import { useReviewStore } from "@/store/register/reviewStore";
+import { useMeasurementSessionStore } from "@/features/measurement/model/store/measurement-session";
 
 interface BackModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+    isOpen: boolean;
+    onClose: () => void;
 }
 
-export default function BackModal({
-    isOpen, 
-    onClose
-} : BackModalProps) {
-    const cancelMeasurement = useMeasurementStore((state) => state.cancelMeasurement);
+export default function BackModal({ isOpen, onClose }: BackModalProps) {
+    const resetMeasurement = useMeasurementSessionStore(
+        (state) => state.resetMeasurement,
+    );
     const { reset } = useReviewStore();
     const router = useRouter();
 
     const handleGoBack = () => {
-        cancelMeasurement(); // 데이터 초기화
-        reset();             // 한줄평 초기화
-        onClose();             // 모달 닫기
-        router.push("/");    // 메인 페이지로 이동
+        resetMeasurement(); // 데이터 초기화
+        reset(); // 한줄평 초기화
+        onClose(); // 모달 닫기
+        router.replace("/"); // 메인 페이지로 이동
     };
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <div onClick={(e) => e.stopPropagation()}>
-                <div 
+                <div
                     className={`
                         ${flexColCenter} 
                         w-full
@@ -45,7 +44,7 @@ export default function BackModal({
                         아니면 나가시겠어요?
                     </p>
                 </div>
-                <div 
+                <div
                     className={`
                         w-[16.6875rem]
                         h-[4rem]
@@ -56,15 +55,15 @@ export default function BackModal({
                         pb-[0.5rem]
                     `}
                 >
-                    <Button 
-                        buttonType="secondary" 
+                    <Button
+                        buttonType="secondary"
                         size="xsmall"
-                        onClick={handleGoBack}    
+                        onClick={handleGoBack}
                     >
                         뒤로 가기
                     </Button>
-                    <Button 
-                        buttonType="primary" 
+                    <Button
+                        buttonType="primary"
                         size="xsmall"
                         onClick={onClose}
                     >

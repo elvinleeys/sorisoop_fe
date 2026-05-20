@@ -1,12 +1,12 @@
 "use client";
 
 import KakaoMap from "@/components/kakaoMap/KakaoMap";
-import { useLocationStore } from "@/store/measurement/locationStore";
-import { useMeasurementStore } from "@/store/measurement/measurementStore";
+import { useLocationStore } from "@/entities/location/model/store/locationStore";
+import { useMeasurementSessionStore } from "@/features/measurement/model/store/measurement-session";
 import { getMarkerImg } from "@/util/getDecibelLevel";
 
 export default function RegisterMap() {
-    const { avgDecibel } = useMeasurementStore();
+    const { avgDecibel } = useMeasurementSessionStore();
     const { location } = useLocationStore();
     // GeoJSON coordinates: [longitude, latitude]
     const coordinates = location.location?.coordinates;
@@ -14,9 +14,7 @@ export default function RegisterMap() {
     const lng = coordinates?.[0];
 
     const imgSrc = getMarkerImg(avgDecibel);
-    const marker = lat && lng
-    ? [{ lat, lng, image: imgSrc }]
-    : [];
+    const marker = lat && lng ? [{ lat, lng, image: imgSrc }] : [];
 
     return (
         <section className="mb-[0.875rem]">
@@ -28,10 +26,15 @@ export default function RegisterMap() {
                 draggable={true}
                 onMapClick={async (clickedLat, clickedLng) => {
                     try {
-                    const res = await fetch(`/api/location?x=${clickedLng}&y=${clickedLat}`);
-                    const data = await res.json();
+                        const res = await fetch(
+                            `/api/location?x=${clickedLng}&y=${clickedLat}`,
+                        );
+                        const data = await res.json();
 
-                    if (!res.ok) throw new Error(data.error || "장소 정보 가져오기 실패");
+                        if (!res.ok)
+                            throw new Error(
+                                data.error || "장소 정보 가져오기 실패",
+                            );
 
                         // store 업데이트
                         useLocationStore.getState().setLocation(data);
