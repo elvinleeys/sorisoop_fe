@@ -1,7 +1,5 @@
 "use client";
 
-import { useLocationStore } from "@/store/measurement/locationStore";
-import { useMeasurementStore } from "@/store/measurement/measurementStore";
 import { formatDateTime } from "@/util/formatDateTime";
 import LocationInfo from "./locationInfo/LocationInfo";
 import DecibelResult from "./decibelResult/DecibelResult";
@@ -12,24 +10,43 @@ import { useState } from "react";
 import { useToastStore } from "@/store/toast/useToastStore";
 import { getDecibelLevel } from "@/util/getDecibelLevel";
 import { useMutation } from "@tanstack/react-query";
-import { registerMeasurement, RegisterPayload } from "@/services/measurement/register";
+import {
+    registerMeasurement,
+    RegisterPayload,
+} from "@/services/measurement/register";
+import { useMeasurementSessionStore } from "@/features/measurement/model/store/measurement-session";
+import { useLocationStore } from "@/entities/location/model/store/locationStore";
 
 export default function RegisterForm() {
     const [isSubmitting, setIsSubmitting] = useState(false);
-    
+
     const router = useRouter();
     const addToast = useToastStore((state) => state.addToast);
-    const { avgDecibel, maxDecibel, startedAt, cancelMeasurement } = useMeasurementStore();
+
+    const { avgDecibel, maxDecibel, startedAt, history, resetMeasurement } =
+        useMeasurementSessionStore();
+
     const { location, setLocation } = useLocationStore();
-    const { placeName, kakaoPlaceId, location: geo, categoryCode, categoryName } = location;
-    const { value: comment, isValid, setSubmitAttempted, reset } = useReviewStore();
+    const {
+        placeName,
+        kakaoPlaceId,
+        location: geo,
+        categoryCode,
+        categoryName,
+    } = location;
+    const {
+        value: comment,
+        isValid,
+        setSubmitAttempted,
+        reset,
+    } = useReviewStore();
 
     const mutation = useMutation({
         mutationFn: (payload: RegisterPayload) => registerMeasurement(payload),
         onSuccess: () => {
             addToast(
                 "등록 완료! 측정 데이터와 한줄평이 저장되었습니다. 저장된 정보를 [저장 탭]에서 확인하세요.",
-                2000
+                2000,
             );
             resetRegisterState();
             router.push("/");
@@ -42,7 +59,13 @@ export default function RegisterForm() {
         },
     });
 
-    if (!avgDecibel || !maxDecibel || !startedAt || !geo?.coordinates) return null;
+    if (
+        avgDecibel === null ||
+        maxDecibel === null ||
+        !startedAt ||
+        !geo?.coordinates
+    )
+        return null;
     const decibelLevel = getDecibelLevel(avgDecibel);
     const { date, time } = formatDateTime(startedAt);
 
@@ -55,7 +78,6 @@ export default function RegisterForm() {
     };
 
     const resetRegisterState = () => {
-        cancelMeasurement();
         setLocation({
             kakaoPlaceId: null,
             placeName: "위치 검색 중...",
@@ -92,9 +114,20 @@ export default function RegisterForm() {
     return (
         <section>
             <form className="flex flex-col gap-[1.25rem]">
-                <LocationInfo placeName={placeName!} decibelLevel={decibelLevel} date={date} time={time} />
-                <DecibelResult avgDecibel={avgDecibel} maxDecibel={maxDecibel} />
-                <ReviewInput onSubmit={handleSubmit} isSubmitting={isSubmitting} />
+                <LocationInfo
+                    placeName={placeName!}
+                    decibelLevel={decibelLevel}
+                    date={date}
+                    time={time}
+                />
+                <DecibelResult
+                    avgDecibel={avgDecibel}
+                    maxDecibel={maxDecibel}
+                />
+                <ReviewInput
+                    onSubmit={handleSubmit}
+                    isSubmitting={isSubmitting}
+                />
             </form>
         </section>
     );
