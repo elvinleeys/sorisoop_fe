@@ -23,8 +23,7 @@ export default function RegisterForm() {
     const router = useRouter();
     const addToast = useToastStore((state) => state.addToast);
 
-    const { avgDecibel, maxDecibel, startedAt, history, resetMeasurement } =
-        useMeasurementSessionStore();
+    const { avgDecibel, maxDecibel, startedAt } = useMeasurementSessionStore();
 
     const { location, setLocation } = useLocationStore();
     const {
@@ -34,6 +33,7 @@ export default function RegisterForm() {
         categoryCode,
         categoryName,
     } = location;
+
     const {
         value: comment,
         isValid,
