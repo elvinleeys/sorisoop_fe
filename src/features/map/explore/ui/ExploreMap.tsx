@@ -16,6 +16,7 @@ import { useMapLocationStore } from "@/store/map/useMapLocationStore";
 import { useBottomSheetStore } from "@/store/bottomSheet/useBottomSheetStore";
 import Loading from "@/features/loading/ui/Loading";
 import { Bounds } from "@/shared/types/kakaoMap";
+import { useFilterDataStore } from "@/store/filter/useFilterDataStore";
 
 export default function ExploreMap() {
     const { myLocation } = useExploreLocation();
@@ -27,7 +28,7 @@ export default function ExploreMap() {
     } = useMapLocationStore();
 
     const openSheet = useBottomSheetStore((s) => s.openSheet);
-
+    const appliedRadius = useFilterDataStore((s) => s.appliedRadius);
     const [map, setMap] = useState<kakao.maps.Map | null>(null);
     const [initialCenter, setInitialCenter] = useState<{
         lat: number;
@@ -60,10 +61,9 @@ export default function ExploreMap() {
     /**
      * marker query
      */
-    const { markers, appliedRadius, isLoading, isFetching, isError } =
-        useExploreMarkers({
-            bounds,
-        });
+    const { markers, isLoading, isFetching, isError } = useExploreMarkers({
+        bounds,
+    });
 
     const mapLevel = getMapLevel(appliedRadius);
 

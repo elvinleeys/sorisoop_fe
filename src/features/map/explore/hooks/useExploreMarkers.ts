@@ -20,21 +20,16 @@ interface Props {
 }
 
 export function useExploreMarkers({ bounds }: Props) {
-    const {
-        appliedCategories,
-        appliedNoiseLevels,
-        appliedRadius,
-        resetTrigger,
-    } = useFilterDataStore();
-
+    const { appliedCategories, appliedNoiseLevels } = useFilterDataStore();
+    const boundsKey = bounds
+        ? `${bounds.swLat}-${bounds.swLng}-${bounds.neLat}-${bounds.neLng}`
+        : null;
     const query = useQuery<NoiseMarker[]>({
         queryKey: [
             "noiseMarkers",
-            bounds,
+            boundsKey,
             appliedCategories,
             appliedNoiseLevels,
-            appliedRadius ?? 200,
-            resetTrigger,
         ],
         queryFn: async ({ signal }) => {
             if (!bounds) return [];
@@ -60,7 +55,6 @@ export function useExploreMarkers({ bounds }: Props) {
 
     return {
         markers,
-        appliedRadius,
         isLoading: query.isLoading,
         isFetching: query.isFetching,
         isError: query.isError,
