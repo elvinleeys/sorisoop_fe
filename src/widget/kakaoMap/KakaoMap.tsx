@@ -7,7 +7,7 @@ import { getCachedMarkerImage } from "@/shared/lib/kakao/markerImageCache";
 import { MAP_POLICY } from "@/shared/lib/kakao/mapPolicy";
 import { loadKakaoMap } from "@/shared/lib/kakao/loadKakaoMap";
 import { getMarkerSize } from "@/shared/lib/kakao/getMarkerSize";
-import { MapController } from "@/shared/types/kakaoMap";
+import { Bounds, MapController } from "@/shared/types/kakaoMap";
 
 type MapMode = keyof typeof MAP_POLICY;
 
@@ -25,6 +25,7 @@ interface KakaoMapProps {
     level?: number;
     mode: MapMode;
     onMarkerClick?: (marker: Marker) => void;
+    onBoundsChange?: (bounds: Bounds) => void;
     onMapClick?: (lat: number, lng: number) => void;
     onMapReady?: (map: kakao.maps.Map) => void;
 }
@@ -36,6 +37,7 @@ export default function KakaoMap({
     level,
     onMarkerClick,
     onMapClick,
+    onBoundsChange,
     onMapReady,
     mode,
 }: KakaoMapProps) {
@@ -129,22 +131,32 @@ export default function KakaoMap({
 
         const map = controllerRef.current?.map;
 
-        if (!map) return;
+        if (!map || !onBoundsChange) return;
 
-        const handler = () => {
-            const level = map.getLevel();
+        const emitBounds = () => {
+            const bounds = map.getBounds();
 
-            const size = getMarkerSize(level);
+            const sw = bounds.getSouthWest();
+            const ne = bounds.getNorthEast();
 
-            markerManagerRef.current?.resizeMarkers(size, getCachedMarkerImage);
+            onBoundsChange({
+                swLat: sw.getLat(),
+                swLng: sw.getLng(),
+                neLat: ne.getLat(),
+                neLng: ne.getLng(),
+            });
         };
 
-        kakao.maps.event.addListener(map, "zoom_changed", handler);
+        // 최초 1회
+        emitBounds();
+
+        // 이동/줌 종료 후
+        kakao.maps.event.addListener(map, "idle", emitBounds);
 
         return () => {
-            kakao.maps.event.removeListener(map, "zoom_changed", handler);
+            kakao.maps.event.removeListener(map, "idle", emitBounds);
         };
-    }, [isMapReady]);
+    }, [isMapReady, onBoundsChange]);
 
     useEffect(() => {
         if (!isMapReady) return;
