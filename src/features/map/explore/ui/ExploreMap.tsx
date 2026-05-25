@@ -15,6 +15,7 @@ import { useMapLocationStore } from "@/store/map/useMapLocationStore";
 
 import { useBottomSheetStore } from "@/store/bottomSheet/useBottomSheetStore";
 import Loading from "@/features/loading/ui/Loading";
+import { Bounds } from "@/shared/types/kakaoMap";
 
 export default function ExploreMap() {
     const { myLocation } = useExploreLocation();
@@ -32,6 +33,7 @@ export default function ExploreMap() {
         lat: number;
         lng: number;
     } | null>(null);
+    const [bounds, setBounds] = useState<Bounds | null>(null);
 
     /**
      * center
@@ -60,7 +62,7 @@ export default function ExploreMap() {
      */
     const { markers, appliedRadius, isLoading, isFetching, isError } =
         useExploreMarkers({
-            center: initialCenter,
+            bounds,
         });
 
     const mapLevel = getMapLevel(appliedRadius);
@@ -108,6 +110,7 @@ export default function ExploreMap() {
                 markers={markers}
                 mode="explore"
                 onMapReady={setMap}
+                onBoundsChange={setBounds}
                 onMarkerClick={(m) => {
                     if (!m.id) return;
 
