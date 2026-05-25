@@ -46,15 +46,18 @@ export function createMarkerManager(map: kakao.maps.Map) {
                 if (existing) {
                     existing.marker.setPosition(position);
 
-                    if (m.image) {
+                    const isImageChanged = existing.image !== m.image;
+
+                    const isSizeChanged = existing.size !== markerSize;
+
+                    if (m.image && (isImageChanged || isSizeChanged)) {
                         existing.marker.setImage(
                             imageCache(m.image, markerSize),
                         );
+
+                        existing.image = m.image;
+                        existing.size = markerSize;
                     }
-
-                    existing.marker.setMap(map);
-
-                    existing.image = m.image;
 
                     return;
                 }
@@ -77,6 +80,7 @@ export function createMarkerManager(map: kakao.maps.Map) {
                 markerMap.set(m.id, {
                     marker,
                     image: m.image,
+                    size: markerSize,
                 });
             });
         },
@@ -84,8 +88,9 @@ export function createMarkerManager(map: kakao.maps.Map) {
         resizeMarkers(size: number, imageCache: MarkerImageCache) {
             markerMap.forEach((value) => {
                 if (!value.image) return;
-
+                if (value.size === size) return;
                 value.marker.setImage(imageCache(value.image, size));
+                value.size = size;
             });
         },
 
