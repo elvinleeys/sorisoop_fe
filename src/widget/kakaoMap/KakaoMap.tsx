@@ -8,6 +8,8 @@ import { MAP_POLICY } from "@/shared/lib/kakao/mapPolicy";
 import { loadKakaoMap } from "@/shared/lib/kakao/loadKakaoMap";
 import { getMarkerSize } from "@/shared/lib/kakao/getMarkerSize";
 import { Bounds, MapController } from "@/shared/types/kakaoMap";
+import { debounce } from "@/shared/lib/map/debounce";
+import { normalizeBounds } from "@/shared/lib/map/normalizeBound";
 
 type MapMode = keyof typeof MAP_POLICY;
 
@@ -48,6 +50,23 @@ export default function KakaoMap({
     const markerManagerRef = useRef<ReturnType<
         typeof createMarkerManager
     > | null>(null);
+    const debouncedEmitBoundsRef = useRef(
+        debounce((map: kakao.maps.Map) => {
+            const bounds = map.getBounds();
+
+            const sw = bounds.getSouthWest();
+            const ne = bounds.getNorthEast();
+
+            const normalized = normalizeBounds({
+                swLat: sw.getLat(),
+                swLng: sw.getLng(),
+                neLat: ne.getLat(),
+                neLng: ne.getLng(),
+            });
+
+            onBoundsChange?.(normalized);
+        }, 250),
+    );
 
     const policy = MAP_POLICY[mode];
 
@@ -133,28 +152,16 @@ export default function KakaoMap({
 
         if (!map || !onBoundsChange) return;
 
-        const emitBounds = () => {
-            const bounds = map.getBounds();
-
-            const sw = bounds.getSouthWest();
-            const ne = bounds.getNorthEast();
-
-            onBoundsChange({
-                swLat: sw.getLat(),
-                swLng: sw.getLng(),
-                neLat: ne.getLat(),
-                neLng: ne.getLng(),
-            });
+        const handler = () => {
+            debouncedEmitBoundsRef.current(map);
         };
 
-        // 최초 1회
-        emitBounds();
+        handler();
 
-        // 이동/줌 종료 후
-        kakao.maps.event.addListener(map, "idle", emitBounds);
+        kakao.maps.event.addListener(map, "idle", handler);
 
         return () => {
-            kakao.maps.event.removeListener(map, "idle", emitBounds);
+            kakao.maps.event.removeListener(map, "idle", handler);
         };
     }, [isMapReady, onBoundsChange]);
 
