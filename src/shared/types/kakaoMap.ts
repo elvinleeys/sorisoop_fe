@@ -8,6 +8,7 @@ export interface MapMarker {
 export interface MarkerInstance {
     marker: kakao.maps.Marker;
     image?: string;
+    size?: number;
 }
 
 export interface MapControllerOptions {
