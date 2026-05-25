@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useFilterDataStore } from "@/store/filter/useFilterDataStore";
 import { fetchNoiseMarkers } from "@/services/map/fetchNoiseMarker";
 import { getMarkerImg } from "@/util/getDecibelLevel";
+import { Bounds } from "@/shared/types/kakaoMap";
 
 export interface NoiseMarker {
     id: string;
@@ -15,13 +16,10 @@ export interface NoiseMarker {
 }
 
 interface Props {
-    center: {
-        lat: number;
-        lng: number;
-    } | null;
+    bounds: Bounds | null;
 }
 
-export function useExploreMarkers({ center }: Props) {
+export function useExploreMarkers({ bounds }: Props) {
     const {
         appliedCategories,
         appliedNoiseLevels,
@@ -32,18 +30,17 @@ export function useExploreMarkers({ center }: Props) {
     const query = useQuery<NoiseMarker[]>({
         queryKey: [
             "noiseMarkers",
-            center,
+            bounds,
             appliedCategories,
             appliedNoiseLevels,
             appliedRadius ?? 200,
             resetTrigger,
         ],
         queryFn: async ({ signal }) => {
-            if (!center) return [];
+            if (!bounds) return [];
 
             const data = await fetchNoiseMarkers({
-                center,
-                radius: appliedRadius,
+                bounds,
                 categories: appliedCategories,
                 noiseLevels: appliedNoiseLevels,
                 signal,
@@ -54,7 +51,7 @@ export function useExploreMarkers({ center }: Props) {
                 image: getMarkerImg(d.avgDecibel ?? null),
             }));
         },
-        enabled: !!center,
+        enabled: !!bounds,
     });
 
     const markers = useMemo(() => {
@@ -64,7 +61,6 @@ export function useExploreMarkers({ center }: Props) {
     return {
         markers,
         appliedRadius,
-
         isLoading: query.isLoading,
         isFetching: query.isFetching,
         isError: query.isError,
