@@ -28,3 +28,10 @@ export type MarkerImageCache = (
     src: string,
     size: number,
 ) => kakao.maps.MarkerImage;
+
+export interface Bounds {
+    swLat: number;
+    swLng: number;
+    neLat: number;
+    neLng: number;
+}
