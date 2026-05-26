@@ -6,9 +6,14 @@ import MeasurementStats from "./measurementStats/MeasurementStats";
 import { MeasurementDescription } from "./MeasurementDescription";
 import MeasurementButton from "./button/MeasurementButton";
 import MeasurementVisualizer from "./measurementVisualizer/MeasurementVisualizer";
+import { useEffect } from "react";
 
 export default function MeasurementCard() {
     const status = useMeasurementSessionStore((s) => s.status);
+
+    useEffect(() => {
+        useMeasurementSessionStore.getState().resetMeasurement();
+    }, []);
 
     const cardColor =
         status === "idle"
