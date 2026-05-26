@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 
 import KakaoMap from "@/widget/kakaoMap/KakaoMap";
 
@@ -30,76 +30,35 @@ export default function ExploreMap() {
     const openSheet = useBottomSheetStore((s) => s.openSheet);
     const appliedRadius = useFilterDataStore((s) => s.appliedRadius);
     const [map, setMap] = useState<kakao.maps.Map | null>(null);
-    const [initialCenter, setInitialCenter] = useState<{
-        lat: number;
-        lng: number;
-    } | null>(null);
     const [bounds, setBounds] = useState<Bounds | null>(null);
 
     /**
-     * center
+     * ✅ 1. initialCenter → useEffect 제거 (derived state)
      */
-    useEffect(() => {
-        if (initialCenter) return;
-
-        if (storeLat && storeLng) {
-            setInitialCenter({
-                lat: storeLat,
-                lng: storeLng,
-            });
-            return;
-        }
-
-        if (myLocation) {
-            setInitialCenter({
-                lat: myLocation.lat,
-                lng: myLocation.lng,
-            });
-        }
-    }, [storeLat, storeLng, myLocation, initialCenter]);
+    const initialCenter = useMemo(() => {
+        return (
+            (storeLat && storeLng && { lat: storeLat, lng: storeLng }) ||
+            (myLocation && { lat: myLocation.lat, lng: myLocation.lng }) || {
+                lat: 37.5665,
+                lng: 126.978,
+            } // 서울 fallback
+        );
+    }, [storeLat, storeLng, myLocation]);
 
     /**
      * marker query
      */
-    const { markers, isLoading, isFetching, isError } = useExploreMarkers({
+    const { markers, isFetching, isError } = useExploreMarkers({
         bounds,
     });
 
     const mapLevel = getMapLevel(appliedRadius);
 
-    /**
-     * loading
-     */
-    if (!initialCenter) {
-        return (
-            <Loading
-                messages={[
-                    "현재 위치를 확인하는 중...",
-                    "GPS 정보를 불러오는 중...",
-                    "지도를 준비하는 중...",
-                    "거의 완료됐어요!",
-                ]}
-            />
-        );
-    }
-
-    if (isLoading) {
-        return (
-            <Loading
-                isDone={!isFetching}
-                messages={[
-                    "주변 소음 데이터를 불러오는 중...",
-                    "마커 정보를 계산하는 중...",
-                    "지도를 렌더링하는 중...",
-                    "거의 완료됐어요!",
-                ]}
-            />
-        );
-    }
-
     if (isError) {
         return <div>마커 불러오기 실패</div>;
     }
+
+    const isSkeletonVisible = isFetching && markers.length === 0;
 
     return (
         <div className="relative">
@@ -122,7 +81,17 @@ export default function ExploreMap() {
                     });
                 }}
             />
-
+            {isSkeletonVisible && (
+                <div className="absolute inset-0 z-10">
+                    <Loading
+                        messages={[
+                            "주변 소음 데이터를 불러오는 중...",
+                            "마커 정보를 계산하는 중...",
+                            "거의 완료됐어요!",
+                        ]}
+                    />
+                </div>
+            )}
             <LocateButton
                 onClick={() => {
                     if (!map || !myLocation) return;
