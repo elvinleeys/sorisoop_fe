@@ -129,7 +129,9 @@ export default function KakaoMap({
 
         if (!controller || !markerManager) return;
 
-        if (level) {
+        const currentLevel = controller.map.getLevel();
+
+        if (level && currentLevel !== level) {
             controller.setLevel(level);
         }
 
@@ -143,7 +145,7 @@ export default function KakaoMap({
             imageCache: getCachedMarkerImage,
             onMarkerClick,
         });
-    }, [isMapReady, lat, lng, markers, level, onMarkerClick, policy]);
+    }, [isMapReady, markers, level, onMarkerClick, policy]);
 
     useEffect(() => {
         if (!isMapReady) return;
