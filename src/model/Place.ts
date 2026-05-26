@@ -1,58 +1,81 @@
 import mongoose, { Document, Model, Schema, Types } from "mongoose";
 
 export interface IPlace extends Document {
-  _id: Types.ObjectId;
-  kakaoPlaceId?: string;
-  placeName: string;
-  location: {
-    type: "Point";
-    coordinates: [number, number]; // [경도, 위도]
-  };
-  categoryCode: "CT1" | "AT4" | "FD6" | "CE7" | "";
-  categoryName: "문화시설" | "관광명소" | "음식점" | "카페" | "";
+    _id: Types.ObjectId;
+    kakaoPlaceId?: string;
+    placeName: string;
+    location: {
+        type: "Point";
+        coordinates: [number, number]; // [경도, 위도]
+    };
+    categoryCode: "CT1" | "AT4" | "FD6" | "CE7" | "";
+    categoryName: "문화시설" | "관광명소" | "음식점" | "카페" | "";
+    avgDecibelCached: number;
+    measurementCount: number;
 }
 
-const PlaceSchema: Schema<IPlace> = new Schema(
-  {
+const PlaceSchema: Schema<IPlace> = new Schema({
     kakaoPlaceId: {
-      type: String,
-      default: null, // 값이 없으면 명시적으로 null
+        type: String,
+        default: null, // 값이 없으면 명시적으로 null
     },
     placeName: { type: String, required: true },
     location: {
-      type: {
-        type: String,
-        enum: ["Point"], // GeoJSON Point만 허용
-        required: true,
-      },
-      coordinates: {
-        type: [Number], // [경도, 위도]
-        required: true,
-      },
+        type: {
+            type: String,
+            enum: ["Point"], // GeoJSON Point만 허용
+            required: true,
+        },
+        coordinates: {
+            type: [Number], // [경도, 위도]
+            required: true,
+        },
     },
     categoryCode: {
-      type: String,
-      enum: ["CT1", "AT4", "FD6", "CE7", ""],
-      required: false,
+        type: String,
+        enum: ["CT1", "AT4", "FD6", "CE7", ""],
+        required: false,
     },
     categoryName: {
-      type: String,
-      enum: ["문화시설", "관광명소", "음식점", "카페", ""],
-      required: false,
+        type: String,
+        enum: ["문화시설", "관광명소", "음식점", "카페", ""],
+        required: false,
     },
-  },
-);
+    avgDecibelCached: {
+        type: Number,
+        default: 0,
+        required: true,
+    },
+    measurementCount: {
+        type: Number,
+        default: 0,
+        required: true,
+    },
+});
 
 // GeoJSON 인덱스 생성 (위치 기반 검색에 필요)
 PlaceSchema.index({ location: "2dsphere" });
 
 // kakaoPlaceId 가 존재하고 null 이 아닐 때만 unique 검사
 PlaceSchema.index(
-  { kakaoPlaceId: 1 },
-  { unique: true, partialFilterExpression: { kakaoPlaceId: { $type: "string" } } }
+    { kakaoPlaceId: 1 },
+    {
+        unique: true,
+        partialFilterExpression: { kakaoPlaceId: { $type: "string" } },
+    },
 );
 
+// 위치 + 카테고리 조회 최적화
+PlaceSchema.index({
+    categoryCode: 1,
+});
+
+// 평균 데시벨 필터 최적화
+PlaceSchema.index({
+    avgDecibelCached: 1,
+});
+
 const Place: Model<IPlace> =
-  mongoose.models.Place || mongoose.model<IPlace>("Place", PlaceSchema);
+    mongoose.models.Place || mongoose.model<IPlace>("Place", PlaceSchema);
 
 export default Place;
