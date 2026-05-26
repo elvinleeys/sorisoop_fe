@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useExploreLocationStore } from "../model/store/exploreLocationStore";
 
 const GEO_OPTIONS: PositionOptions = {
     enableHighAccuracy: true,
@@ -7,18 +8,14 @@ const GEO_OPTIONS: PositionOptions = {
 };
 
 export function useExploreLocation() {
-    const [myLocation, setMyLocation] = useState<{
-        lat: number;
-        lng: number;
-    } | null>(null);
+    const setCurrentLocation = useExploreLocationStore(
+        (s) => s.setCurrentLocation,
+    );
 
     useEffect(() => {
         const watchId = navigator.geolocation.watchPosition(
             (pos) => {
-                setMyLocation({
-                    lat: pos.coords.latitude,
-                    lng: pos.coords.longitude,
-                });
+                setCurrentLocation(pos.coords.latitude, pos.coords.longitude);
             },
             (err) => {
                 console.error(err);
@@ -29,9 +26,5 @@ export function useExploreLocation() {
         return () => {
             navigator.geolocation.clearWatch(watchId);
         };
-    }, []);
-
-    return {
-        myLocation,
-    };
+    }, [setCurrentLocation]);
 }
