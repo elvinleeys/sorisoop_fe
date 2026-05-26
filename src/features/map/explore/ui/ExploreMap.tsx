@@ -17,10 +17,11 @@ import { useBottomSheetStore } from "@/store/bottomSheet/useBottomSheetStore";
 import Loading from "@/features/loading/ui/Loading";
 import { Bounds } from "@/shared/types/kakaoMap";
 import { useFilterDataStore } from "@/store/filter/useFilterDataStore";
+import { useExploreLocationStore } from "../model/store/exploreLocationStore";
 
 export default function ExploreMap() {
-    const { myLocation } = useExploreLocation();
-
+    useExploreLocation();
+    const { lat: currentLat, lng: currentLng } = useExploreLocationStore();
     const {
         lat: storeLat,
         lng: storeLng,
@@ -38,12 +39,13 @@ export default function ExploreMap() {
     const initialCenter = useMemo(() => {
         return (
             (storeLat && storeLng && { lat: storeLat, lng: storeLng }) ||
-            (myLocation && { lat: myLocation.lat, lng: myLocation.lng }) || {
+            (currentLat &&
+                currentLng && { lat: currentLat, lng: currentLng }) || {
                 lat: 37.5665,
                 lng: 126.978,
             } // 서울 fallback
         );
-    }, [storeLat, storeLng, myLocation]);
+    }, [storeLat, storeLng, currentLat, currentLng]);
 
     /**
      * marker query
@@ -94,13 +96,11 @@ export default function ExploreMap() {
             )}
             <LocateButton
                 onClick={() => {
-                    if (!map || !myLocation) return;
+                    if (!map || !currentLat || !currentLng) return;
 
                     clearLocation();
 
-                    map.panTo(
-                        new kakao.maps.LatLng(myLocation.lat, myLocation.lng),
-                    );
+                    map.panTo(new kakao.maps.LatLng(currentLat, currentLng));
                 }}
             />
         </div>
