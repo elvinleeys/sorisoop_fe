@@ -47,6 +47,7 @@ export default function KakaoMap({
     const mapRef = useRef<HTMLDivElement>(null);
     const controllerRef = useRef<MapController | null>(null);
     const prevCenterRef = useRef({ lat, lng });
+    const prevLevelPropRef = useRef<number | undefined>(level);
     const markerManagerRef = useRef<ReturnType<
         typeof createMarkerManager
     > | null>(null);
@@ -129,11 +130,11 @@ export default function KakaoMap({
 
         if (!controller || !markerManager) return;
 
-        const currentLevel = controller.map.getLevel();
-
-        if (level && currentLevel !== level) {
+        // ✅ prop으로 전달된 level이 실제로 변경된 경우에만 setLevel 호출
+        if (level !== undefined && level !== prevLevelPropRef.current) {
             controller.setLevel(level);
         }
+        prevLevelPropRef.current = level;
 
         const markerSize = policy.markerResizable
             ? getMarkerSize(level ?? policy.level)
@@ -145,6 +146,8 @@ export default function KakaoMap({
             imageCache: getCachedMarkerImage,
             onMarkerClick,
         });
+
+        console.log("current:", controller.map.getLevel(), "target:", level);
     }, [isMapReady, markers, level, onMarkerClick, policy]);
 
     useEffect(() => {

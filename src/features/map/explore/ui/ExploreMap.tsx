@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import KakaoMap from "@/widget/kakaoMap/KakaoMap";
 
@@ -32,7 +32,9 @@ export default function ExploreMap() {
     const appliedRadius = useFilterDataStore((s) => s.appliedRadius);
     const [map, setMap] = useState<kakao.maps.Map | null>(null);
     const [bounds, setBounds] = useState<Bounds | null>(null);
-
+    const [mapLevel, setMapLevel] = useState(getMapLevel(appliedRadius));
+    // ✅ 최초 로딩 여부 추적
+    const hasLoadedOnce = useRef(false);
     /**
      * ✅ 1. initialCenter → useEffect 제거 (derived state)
      */
@@ -54,14 +56,21 @@ export default function ExploreMap() {
         bounds,
     });
 
-    const mapLevel = getMapLevel(appliedRadius);
+    useEffect(() => {
+        if (!isFetching && markers.length >= 0 && bounds) {
+            hasLoadedOnce.current = true;
+        }
+    }, [isFetching, markers, bounds]);
+
+    useEffect(() => {
+        setMapLevel(getMapLevel(appliedRadius));
+    }, [appliedRadius]);
 
     if (isError) {
         return <div>마커 불러오기 실패</div>;
     }
 
-    const isSkeletonVisible = isFetching && markers.length === 0;
-
+    const isSkeletonVisible = isFetching && !hasLoadedOnce.current;
     return (
         <div className="relative">
             <KakaoMap
