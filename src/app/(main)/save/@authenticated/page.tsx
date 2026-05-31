@@ -7,7 +7,6 @@ import SaveResultList from "@/components/save/saveResultList/SaveResultList";
 import { useAuthStore } from "@/store/auth/authStore";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import Loading from "@/components/loading/Loading";
 
 export default function AuthenticatedSavePage() {
     const router = useRouter();
@@ -23,18 +22,18 @@ export default function AuthenticatedSavePage() {
     // 🔹 403 (혹은 인증 실패) 시 guest로 이동
     useEffect(() => {
         if (isError) {
-        if (
-            (error as Error)?.message?.includes("403") ||
-            (error as Error)?.message?.includes("Unauthorized") ||
-            (error as Error)?.message?.includes("인증 실패")
-        ) {
-            setAccessToken(null); // 상태 초기화
-            router.replace("/save?guest=true"); // guest로 리다이렉트
-        }
+            if (
+                (error as Error)?.message?.includes("403") ||
+                (error as Error)?.message?.includes("Unauthorized") ||
+                (error as Error)?.message?.includes("인증 실패")
+            ) {
+                setAccessToken(null); // 상태 초기화
+                router.replace("/save?guest=true"); // guest로 리다이렉트
+            }
         }
     }, [isError, error, router, setAccessToken]);
 
-    if (isPending) return <Loading />;
+    if (isPending) return;
     if (isError) return <p>오류가 발생했습니다: {error?.message}</p>;
     if (!data || data.length === 0) return <NoData />;
 

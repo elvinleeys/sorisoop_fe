@@ -11,12 +11,7 @@ import { useFilterDataStore } from "@/store/filter/useFilterDataStore";
 
 export default function FilterBottomSheet() {
     const { isOpen, close } = useFilterUIStore();
-    const { 
-        applyFilters, 
-        resetFilters, 
-        discardFilters, 
-        triggerReset 
-    } = useFilterDataStore();
+    const { applyFilters, resetFilters, discardFilters } = useFilterDataStore();
 
     const handleClose = () => {
         discardFilters(); // 임시 선택값 무시하고 applied 값으로 복원
@@ -25,7 +20,6 @@ export default function FilterBottomSheet() {
 
     const handleApply = () => {
         applyFilters();
-        triggerReset();
         close();
     };
 
@@ -37,7 +31,7 @@ export default function FilterBottomSheet() {
     return (
         <ClientOnlyPortal containerId="bottom-sheet">
             <BottomSheet isOpen={isOpen} onClose={handleClose}>
-                <main 
+                <main
                     className={`
                         ${flexCol}
                         gap-[1.3125rem]
@@ -47,11 +41,11 @@ export default function FilterBottomSheet() {
                         px-[1rem]
                     `}
                 >
-                    <CategorySection onClose={handleClose}/>
+                    <CategorySection onClose={handleClose} />
                     <DecibelSection />
                     <RadiusSection />
                 </main>
-                <footer 
+                <footer
                     className={`
                         ${flexRowCenter}
                         gap-[0.625rem]
@@ -64,16 +58,16 @@ export default function FilterBottomSheet() {
                         [box-shadow:-2px_-1px_4px_0_rgba(0,0,0,0.15)]
                     `}
                 >
-                    <Button 
-                        buttonType="tertiary" 
-                        size="small" 
+                    <Button
+                        buttonType="tertiary"
+                        size="small"
                         onClick={handleReset}
                     >
                         초기화
                     </Button>
-                    <Button 
-                        buttonType="primary" 
-                        size="small" 
+                    <Button
+                        buttonType="primary"
+                        size="small"
                         onClick={handleApply}
                     >
                         적용
