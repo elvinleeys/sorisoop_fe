@@ -15,7 +15,7 @@
 
 **Soridam 프로젝트**는 측정된 소음 데이터를 시각화하여 지도에서 주변 장소의 소음 수준을 한 눈에 파악할 수 있는 플랫폼입니다.
 
-- **Vercel**: [https://soridam-one.vercel.app/](https://soridam-one.vercel.app/)
+- **Vercel**: [https://sorisoop-fe.vercel.app/](https://sorisoop-fe.vercel.app/)
 - **Storybook**: [https://68b18c520a82ac63f9524bc5-rueqmotjmh.chromatic.com/?path=/docs/configure-your-project--docs](https://68b18c520a82ac63f9524bc5-rueqmotjmh.chromatic.com/?path=/docs/configure-your-project--docs)
 - **Design-system 관련 repo**: [https://github.com/elvinleeys/soridam_storybook?tab=readme-ov-file](https://github.com/elvinleeys/soridam_storybook?tab=readme-ov-file)
 
@@ -29,7 +29,7 @@
 | :---------------------------------: | :---------------------: |
 |         기획 아이디어 공유          |       2024.12.04        |
 | 배경조사, 문제 정의, 가설 설정 공유 |       2024.12.05        |
-|                기획                 | 2024.12.08 ~ 2025.12.13 |
+|                기획                 | 2024.12.08 ~ 2024.12.13 |
 |            해커톤(개발)             |       2024.12.15        |
 |              보완 개발              | 2024.12.18 ~ 2025.03.11 |
 
@@ -151,13 +151,7 @@ erDiagram
 ### ✅ 4️⃣ 핵심 요약 (README용 문장)
 
 > - `User`: 회원 정보 및 Refresh Token 관리
-> - `Place`:
-
-- 장소 정보 저장
-- 장소별 누적 평균 소음(avgDecibelCached) 저장
-- 측정 횟수(measurementCount) 저장
-- 지도 조회 시 마커 데이터 제공
-
+> - `Place`:장소 정보와 누적 소음 통계(평균 소음·측정 횟수)를 관리하며 지도 마커의 기준 데이터 역할을 수행
 > - `Measurement`: 개별 측정 원본 데이터 저장
 > - 관계:
 >     - **User (1) → (N) Measurement**
@@ -303,52 +297,52 @@ or
 - **GET /api/location**
 - Request Parameters
       <table>
-          <thead>
-              <tr>
-                  <td>
-                      Name
-                  </td>
-                  <td>
-                      Type
-                  </td>
-                  <td>
-                      Required
-                  </td>
-                  <td>
-                      Description
-                  </td>
-              </tr>
-          </thead>
-          <tbody>
-              <tr>
-                  <td>
-                      x
-                  </td>
-                  <td>
-                      string
-                  </td>
-                  <td>
-                      ✅
-                  </td>
-                  <td>
-                      경도 (longitude)
-                  </td>
-              </tr>
-              <tr>
-                  <td>
-                      y
-                  </td>
-                  <td>
-                      string
-                  </td>
-                  <td>
-                      ✅
-                  </td>
-                  <td>
-                      위도 (latitude)
-                  </td>
-              </tr>
-          </tbody>
+      <thead>
+      <tr>
+      <td>
+      Name
+      </td>
+      <td>
+      Type
+      </td>
+      <td>
+      Required
+      </td>
+      <td>
+      Description
+      </td>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td>
+      x
+      </td>
+      <td>
+      string
+      </td>
+      <td>
+      ✅
+      </td>
+      <td>
+      경도 (longitude)
+      </td>
+      </tr>
+      <tr>
+      <td>
+      y
+      </td>
+      <td>
+      string
+      </td>
+      <td>
+      ✅
+      </td>
+      <td>
+      위도 (latitude)
+      </td>
+      </tr>
+      </tbody>
       </table>
 
 - Response
@@ -847,12 +841,11 @@ or
   "success": true,
   "data": [
     {
-        "id": "...",
-        "lat": 37.49,
-        "lng": 127.02,
-        "avgDecibel": 68.4,
-        "measurementCount": 15,
-        "placeName": "..."
+      "id": "671aef0f91a5b3aef5b2a9d8",
+      "lat": 37.49,
+      "lng": 127.02,
+      "avgDecibel": 68.4,
+      "placeName": "스타벅스 강남역점"
     }
   ]
 }
@@ -922,20 +915,32 @@ or
 
 ```js
 {
-  "success": true,
-  "data": {
-    "placeName": "스타벅스 강남역점",
-    "chart": [
-      { "timeRange": "5-11", "db": 65, "count": 10 },
-      { "timeRange": "11-18", "db": 72, "count": 20 },
-      { "timeRange": "18-22", "db": 78, "count": 15 }
-    ],
-    "comments": [
-      "아침에는 조용했어요.",
-      "점심 피크타임엔 꽤 시끄러움.",
-      "저녁은 여유로웠습니다."
-    ]
-  }
+  "placeId": "671aef0f91a5b3aef5b2a9d8",
+  "placeName": "스타벅스 강남역점",
+  "avgDecibelCached": 72.4,
+  "measurementCount": 45,
+  "chart": [
+    {
+      "timeRange": "5-11",
+      "db": 65,
+      "count": 10
+    },
+    {
+      "timeRange": "11-18",
+      "db": 72,
+      "count": 20
+    },
+    {
+      "timeRange": "18-22",
+      "db": 78,
+      "count": 15
+    }
+  ],
+  "comments": [
+    "아침에는 조용했어요.",
+    "점심에는 사람이 많아요.",
+    "저녁은 비교적 한산합니다."
+  ]
 }
 ```
 
@@ -1502,5 +1507,16 @@ or
 ### 2026.01.07
 
 - 보안 이슈로 인한 NextJS 버전 업그레이드
+
+### 2026.05.21 ~ 2026.05.31
+
+1. KakaoMap 성능 최적화
+
+- singleton loader 도입
+- kakaoMap 사용 페이지별 사용 정책 지정
+- kakaoMap 관련 marker, map zoomLevel 조절 등 로직 분리
+- kakaoMap의 bounds를 활용한 상태 관리 도입 및 Debounce 도입
+- marker image cache 도입
+- Place Schema에 avgDecibelCached, MeasurementCount 필드 도입
 
 [맨 위로](#-목차)
