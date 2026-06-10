@@ -16,21 +16,7 @@ export async function GET(
         // 2️⃣ string → ObjectId 변환
         const placeObjectId = new mongoose.Types.ObjectId(id);
 
-        const [grouped, comments, place] = await Promise.all([
-            // ✅ 오늘 제한 제거 → 해당 장소 전체 데이터를 조회
-            Measurement.aggregate([
-                { $match: { placeId: placeObjectId } },
-                {
-                    $group: {
-                        _id: "$timeSlot",
-                        avgDecibel: { $avg: "$avgDecibel" },
-                        count: { $sum: 1 },
-                    },
-                },
-                { $sort: { _id: 1 } },
-            ]),
-
-            // ✅ 한줄평도 오늘 제한 제거 → 장소 전체 코멘트
+        const [comments, place] = await Promise.all([
             Measurement.find(
                 {
                     placeId: placeObjectId,
@@ -41,8 +27,15 @@ export async function GET(
                 .sort({ createdAt: -1 })
                 .limit(20)
                 .lean(),
-            // ✅ 장소 이름
-            Place.findById(placeObjectId).lean(),
+
+            Place.findById(placeObjectId)
+                .select({
+                    placeName: 1,
+                    avgDecibelCached: 1,
+                    measurementCount: 1,
+                    timeSlotStats: 1,
+                })
+                .lean(),
         ]);
 
         if (!place) {
@@ -55,33 +48,33 @@ export async function GET(
             );
         }
 
-        const groupedMap = new Map(grouped.map((item) => [item._id, item]));
-
-        // ✅ UI 고정된 timeSlot 배열
-        const timeSlots: ("5-11" | "11-18" | "18-22")[] = [
-            "5-11",
-            "11-18",
-            "18-22",
-        ];
+        const timeSlots = ["5-11", "11-18", "18-22"] as const;
 
         const chartData = timeSlots.map((slot) => {
-            const found = groupedMap.get(slot);
+            const stat = place.timeSlotStats[slot];
 
             return {
                 timeRange: slot,
-                db: found ? Math.round(found.avgDecibel) : 0,
-                count: found ? found.count : 0,
+                db:
+                    stat.count > 0
+                        ? Math.round(stat.totalDecibel / stat.count)
+                        : 0,
+                count: stat.count,
             };
         });
 
         return NextResponse.json({
             success: true,
             data: {
-                placeId: place?._id,
-                placeName: place?.placeName,
-                avgDecibelCached: place?.avgDecibelCached ?? 0,
-                measurementCount: place?.measurementCount ?? 0,
+                placeId: place._id,
+                placeName: place.placeName,
+
+                avgDecibelCached: place.avgDecibelCached,
+
+                measurementCount: place.measurementCount,
+
                 chart: chartData,
+
                 comments: comments.map((c) => c.comment),
             },
         });

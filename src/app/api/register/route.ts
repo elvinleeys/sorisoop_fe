@@ -4,19 +4,6 @@ import Place from "@/model/Place";
 import Measurement from "@/model/Measurement";
 import { getUserFromToken } from "@/lib/getUserFromToken";
 
-type NewPlaceData = {
-    placeName: string;
-    location: {
-        type: "Point";
-        coordinates: [number, number];
-    };
-    categoryCode: "CT1" | "AT4" | "FD6" | "CE7" | "";
-    categoryName: "문화시설" | "관광명소" | "음식점" | "카페" | "";
-    kakaoPlaceId?: string | null;
-    avgDecibelCached: number;
-    measurementCount: number;
-};
-
 export async function POST(req: NextRequest) {
     try {
         await dbConnect();
@@ -69,7 +56,22 @@ export async function POST(req: NextRequest) {
         let place = null;
 
         if (safeKakaoPlaceId) {
-            place = await Place.findOne({ kakaoPlaceId: safeKakaoPlaceId });
+            place = await Place.findOneAndUpdate(
+                { kakaoPlaceId: safeKakaoPlaceId },
+                {
+                    $setOnInsert: {
+                        placeName,
+                        location,
+                        categoryCode: categoryCode || "",
+                        categoryName: categoryName || "",
+                        kakaoPlaceId: safeKakaoPlaceId,
+                    },
+                },
+                {
+                    upsert: true,
+                    new: true,
+                },
+            );
         }
 
         if (!place) {
@@ -92,9 +94,7 @@ export async function POST(req: NextRequest) {
                 categoryCode: categoryCode || "",
                 categoryName: categoryName || "",
                 kakaoPlaceId: safeKakaoPlaceId,
-                avgDecibelCached: avgDecibel ?? 0,
-                measurementCount: 1,
-            } as NewPlaceData);
+            });
         }
 
         // 3️⃣ Measurement 먼저 저장 (핵심)
@@ -109,23 +109,34 @@ export async function POST(req: NextRequest) {
             comment,
         });
 
+        type TimeSlot = "5-11" | "11-18" | "18-22";
+        const slot = timeSlot as TimeSlot;
         // 4️⃣ Place atomic update (session 없이 안전하게)
-        const updatedPlace = await Place.findById(place._id);
+        const updatedPlace = await Place.findByIdAndUpdate(
+            place._id,
+            {
+                $inc: {
+                    measurementCount: 1,
+                    totalDecibel: avgDecibel,
+
+                    [`timeSlotStats.${slot}.count`]: 1,
+                    [`timeSlotStats.${slot}.totalDecibel`]: avgDecibel,
+                },
+            },
+            {
+                new: true,
+            },
+        );
 
         if (updatedPlace) {
-            const prevAvg = updatedPlace.avgDecibelCached ?? 0;
-            const prevCount = updatedPlace.measurementCount ?? 0;
-
-            const newCount = prevCount + 1;
-
-            const newAvg = (prevAvg * prevCount + avgDecibel) / newCount;
+            const avg =
+                updatedPlace.totalDecibel / updatedPlace.measurementCount;
 
             await Place.updateOne(
-                { _id: place._id },
+                { _id: updatedPlace._id },
                 {
                     $set: {
-                        avgDecibelCached: Number(newAvg.toFixed(1)),
-                        measurementCount: newCount,
+                        avgDecibelCached: Number(avg.toFixed(2)),
                     },
                 },
             );

@@ -6,7 +6,7 @@ import Place from "@/model/Place";
 
 export async function DELETE(
     req: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
+    { params }: { params: Promise<{ id: string }> },
 ) {
     await dbConnect();
 
@@ -31,19 +31,57 @@ export async function DELETE(
         });
 
         if (!deleted) {
-            return NextResponse.json({ message: "삭제할 데이터를 찾을 수 없음" }, { status: 404 });
+            return NextResponse.json(
+                { message: "삭제할 데이터를 찾을 수 없음" },
+                { status: 404 },
+            );
         }
+
+        const updatedPlace = await Place.findByIdAndUpdate(
+            deleted.placeId,
+            {
+                $inc: {
+                    measurementCount: -1,
+                    totalDecibel: -deleted.avgDecibel,
+
+                    [`timeSlotStats.${deleted.timeSlot}.count`]: -1,
+                    [`timeSlotStats.${deleted.timeSlot}.totalDecibel`]:
+                        -deleted.avgDecibel,
+                },
+            },
+            { new: true },
+        );
 
         // 해당 Place에 남아있는 Measurement가 있는지 확인
-        const hasRemaining = await Measurement.exists({ placeId: deleted.placeId });
-
-        if (!hasRemaining) {
+        if (!updatedPlace || updatedPlace.measurementCount <= 0) {
             await Place.findByIdAndDelete(deleted.placeId);
+
+            return NextResponse.json({
+                success: true,
+                message: "삭제 성공",
+            });
         }
 
-        return NextResponse.json({ success: true, message: "삭제 성공" }, { status: 200 });;
+        const avg = updatedPlace.totalDecibel / updatedPlace.measurementCount;
+
+        await Place.updateOne(
+            { _id: updatedPlace._id },
+            {
+                $set: {
+                    avgDecibelCached: Number(avg.toFixed(2)),
+                },
+            },
+        );
+
+        return NextResponse.json(
+            { success: true, message: "삭제 성공" },
+            { status: 200 },
+        );
     } catch (err) {
         console.error("삭제 에러:", err);
-        return NextResponse.json({ success: false, message: "서버 에러" }, { status: 500 });
+        return NextResponse.json(
+            { success: false, message: "서버 에러" },
+            { status: 500 },
+        );
     }
 }
