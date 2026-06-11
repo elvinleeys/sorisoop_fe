@@ -41,6 +41,33 @@ export async function GET(req: NextRequest) {
             };
         }
 
+        if (noiseLevels.length > 0) {
+            const noiseConditions: FilterQuery<IPlace>[] = [];
+
+            if (noiseLevels.includes("quiet")) {
+                noiseConditions.push({
+                    avgDecibelCached: { $lt: 70 },
+                });
+            }
+
+            if (noiseLevels.includes("moderate")) {
+                noiseConditions.push({
+                    avgDecibelCached: {
+                        $gte: 70,
+                        $lt: 100,
+                    },
+                });
+            }
+
+            if (noiseLevels.includes("loud")) {
+                noiseConditions.push({
+                    avgDecibelCached: { $gte: 100 },
+                });
+            }
+
+            placeQuery.$or = noiseConditions;
+        }
+
         const places = await Place.find(placeQuery)
             .select({
                 placeName: 1,
@@ -50,23 +77,9 @@ export async function GET(req: NextRequest) {
             })
             .lean();
 
-        const result = places.filter((place) => {
-            const avg = place.avgDecibelCached;
-
-            if (noiseLevels.length === 0) return true;
-
-            return noiseLevels.some((level) => {
-                if (level === "quiet") return avg < 70;
-                if (level === "moderate") return avg >= 70 && avg < 100;
-                if (level === "loud") return avg >= 100;
-
-                return false;
-            });
-        });
-
         return NextResponse.json({
             success: true,
-            data: result.map((place) => ({
+            data: places.map((place) => ({
                 id: place._id.toString(),
                 lat: place.location.coordinates[1],
                 lng: place.location.coordinates[0],

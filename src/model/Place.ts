@@ -1,5 +1,10 @@
 import mongoose, { Document, Model, Schema, Types } from "mongoose";
 
+interface ITimeSlotStat {
+    totalDecibel: number;
+    count: number;
+}
+
 export interface IPlace extends Document {
     _id: Types.ObjectId;
     kakaoPlaceId?: string;
@@ -10,9 +15,32 @@ export interface IPlace extends Document {
     };
     categoryCode: "CT1" | "AT4" | "FD6" | "CE7" | "";
     categoryName: "문화시설" | "관광명소" | "음식점" | "카페" | "";
-    avgDecibelCached: number;
+    totalDecibel: number;
     measurementCount: number;
+    avgDecibelCached: number;
+    // 시간대별 통계
+    timeSlotStats: {
+        "5-11": ITimeSlotStat;
+        "11-18": ITimeSlotStat;
+        "18-22": ITimeSlotStat;
+    };
 }
+
+const TimeSlotStatSchema = new Schema(
+    {
+        totalDecibel: {
+            type: Number,
+            default: 0,
+            required: true,
+        },
+        count: {
+            type: Number,
+            default: 0,
+            required: true,
+        },
+    },
+    { _id: false },
+);
 
 const PlaceSchema: Schema<IPlace> = new Schema({
     kakaoPlaceId: {
@@ -41,7 +69,7 @@ const PlaceSchema: Schema<IPlace> = new Schema({
         enum: ["문화시설", "관광명소", "음식점", "카페", ""],
         required: false,
     },
-    avgDecibelCached: {
+    totalDecibel: {
         type: Number,
         default: 0,
         required: true,
@@ -50,6 +78,36 @@ const PlaceSchema: Schema<IPlace> = new Schema({
         type: Number,
         default: 0,
         required: true,
+    },
+    avgDecibelCached: {
+        type: Number,
+        default: 0,
+        required: true,
+    },
+    timeSlotStats: {
+        "5-11": {
+            type: TimeSlotStatSchema,
+            default: () => ({
+                totalDecibel: 0,
+                count: 0,
+            }),
+        },
+
+        "11-18": {
+            type: TimeSlotStatSchema,
+            default: () => ({
+                totalDecibel: 0,
+                count: 0,
+            }),
+        },
+
+        "18-22": {
+            type: TimeSlotStatSchema,
+            default: () => ({
+                totalDecibel: 0,
+                count: 0,
+            }),
+        },
     },
 });
 

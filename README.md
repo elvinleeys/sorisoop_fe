@@ -61,7 +61,7 @@
 
 ## 🖥 System Architecture
 
-<img src="./doc/Img/system-architecture.png" alt="system-architecture" />
+<img src="./doc/Img/systemArchitecture.png" alt="system-architecture" />
 
 ## 📁 패키지 구조
 
@@ -130,6 +130,9 @@ erDiagram
         string categoryName
         number avgDecibelCached
         number measurementCount
+        object timeSlotStats_5_11
+        object timeSlotStats_11_18
+        object timeSlotStats_18_22
     }
 
     MEASUREMENT {
@@ -151,7 +154,11 @@ erDiagram
 ### ✅ 4️⃣ 핵심 요약 (README용 문장)
 
 > - `User`: 회원 정보 및 Refresh Token 관리
-> - `Place`:장소 정보와 누적 소음 통계(평균 소음·측정 횟수)를 관리하며 지도 마커의 기준 데이터 역할을 수행
+> - `Place`:장소 정보와 누적 소음 통계를 관리하는 집계(Collection)입니다.
+>   평균 소음(avgDecibelCached), 총 측정 횟수(measurementCount),
+>   총 누적 소음(totalDecibel),
+>   시간대별 통계(timeSlotStats)를 저장하여
+>   지도 조회 및 장소 상세 조회 성능을 최적화합니다.
 > - `Measurement`: 개별 측정 원본 데이터 저장
 > - 관계:
 >     - **User (1) → (N) Measurement**
@@ -296,54 +303,54 @@ or
 
 - **GET /api/location**
 - Request Parameters
-      <table>
-      <thead>
-      <tr>
-      <td>
-      Name
-      </td>
-      <td>
-      Type
-      </td>
-      <td>
-      Required
-      </td>
-      <td>
-      Description
-      </td>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-      <td>
-      x
-      </td>
-      <td>
-      string
-      </td>
-      <td>
-      ✅
-      </td>
-      <td>
-      경도 (longitude)
-      </td>
-      </tr>
-      <tr>
-      <td>
-      y
-      </td>
-      <td>
-      string
-      </td>
-      <td>
-      ✅
-      </td>
-      <td>
-      위도 (latitude)
-      </td>
-      </tr>
-      </tbody>
-      </table>
+    <table>
+    <thead>
+    <tr>
+    <td>
+    Name
+    </td>
+    <td>
+    Type
+    </td>
+    <td>
+    Required
+    </td>
+    <td>
+    Description
+    </td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>
+    x
+    </td>
+    <td>
+    string
+    </td>
+    <td>
+    ✅
+    </td>
+    <td>
+    경도 (longitude)
+    </td>
+    </tr>
+    <tr>
+    <td>
+    y
+    </td>
+    <td>
+    string
+    </td>
+    <td>
+    ✅
+    </td>
+    <td>
+    위도 (latitude)
+    </td>
+    </tr>
+    </tbody>
+    </table>
 
 - Response
   ✅ 200 OK
@@ -398,180 +405,180 @@ or
 
 - **POST /api/register**
 - Request body
-      <table>
-      <thead>
-      <tr>
-      <td>
-      Name
-      </td>
-      <td>
-      Type
-      </td>
-      <td>
-      Required
-      </td>
-      <td>
-      Description
-      </td>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-      <td>
-      placeName
-      </td>
-      <td>
-      string
-      </td>
-      <td>
-      ✅
-      </td>
-      <td>
-      장소명
-      </td>
-      </tr>
-      <tr>
-      <td>
-      kakaoPlaceId
-      </td>
-      <td>
-      string
-      </td>
-      <td>
-      ❌
-      </td>
-      <td>
-      카카오 장소 ID (없을 경우 null)
-      </td>
-      </tr>
-      <tr>
-      <td>
-      location
-      </td>
-      <td>
-      { type: "Point"; coordinates: [number, number]; }
-      </td>
-      <td>
-      ✅
-      </td>
-      <td>
-      장소 좌표 정보
-      </td>
-      </tr>
-      <tr>
-      <td>
-      categoryCode
-      </td>
-      <td>
-      "CT1" | "AT4" | "FD6" | "CE7" | ""
-      </td>
-      <td>
-      ❌
-      </td>
-      <td>
-      장소 카테고리 코드
-      </td>
-      </tr>
-      <tr>
-      <td>
-      categoryName
-      </td>
-      <td>
-      "문화시설" | "관광명소" | "음식점" | "카페" | ""
-      </td>
-      <td>
-      ❌
-      </td>
-      <td>
-      장소 카테고리명
-      </td>
-      </tr>
-      <tr>
-      <td>
-      measuredAt
-      </td>
-      <td>
-      string (ISO Date)
-      </td>
-      <td>
-      ✅
-      </td>
-      <td>
-      측정 시각
-      </td>
-      </tr>
-      <tr>
-      <td>
-      measuredDate
-      </td>
-      <td>
-      string (YYYY-MM-DD)
-      </td>
-      <td>
-      ✅
-      </td>
-      <td>
-      측정 날짜
-      </td>
-      </tr>
-      <tr>
-      <td>
-      timeSlot
-      </td>
-      <td>
-      string
-      </td>
-      <td>
-      ✅
-      </td>
-      <td>
-      시간대 구분 (예: 오전, 오후 등)
-      </td>
-      </tr>
-      <tr>
-      <td>
-      avgDecibel
-      </td>
-      <td>
-      number
-      </td>
-      <td>
-      ❌
-      </td>
-      <td>
-      평균 소음 (dB)
-      </td>
-      </tr>
-      <tr>
-      <td>
-      maxDecibel
-      </td>
-      <td>
-      number
-      </td>
-      <td>
-      ❌
-      </td>
-      <td>
-      최대 소음 (dB)
-      </td>
-      </tr>
-      <tr>
-      <td>
-      comment
-      </td>
-      <td>
-      number
-      </td>
-      <td>
-      ❌
-      </td>
-      <td>
-      사용자 코멘트
-      </td>
-      </tr>
-      </tbody>
-      </table>
+    <table>
+    <thead>
+    <tr>
+    <td>
+    Name
+    </td>
+    <td>
+    Type
+    </td>
+    <td>
+    Required
+    </td>
+    <td>
+    Description
+    </td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>
+    placeName
+    </td>
+    <td>
+    string
+    </td>
+    <td>
+    ✅
+    </td>
+    <td>
+    장소명
+    </td>
+    </tr>
+    <tr>
+    <td>
+    kakaoPlaceId
+    </td>
+    <td>
+    string
+    </td>
+    <td>
+    ❌
+    </td>
+    <td>
+    카카오 장소 ID (없을 경우 null)
+    </td>
+    </tr>
+    <tr>
+    <td>
+    location
+    </td>
+    <td>
+    { type: "Point"; coordinates: [number, number]; }
+    </td>
+    <td>
+    ✅
+    </td>
+    <td>
+    장소 좌표 정보
+    </td>
+    </tr>
+    <tr>
+    <td>
+    categoryCode
+    </td>
+    <td>
+    "CT1" | "AT4" | "FD6" | "CE7" | ""
+    </td>
+    <td>
+    ❌
+    </td>
+    <td>
+    장소 카테고리 코드
+    </td>
+    </tr>
+    <tr>
+    <td>
+    categoryName
+    </td>
+    <td>
+    "문화시설" | "관광명소" | "음식점" | "카페" | ""
+    </td>
+    <td>
+    ❌
+    </td>
+    <td>
+    장소 카테고리명
+    </td>
+    </tr>
+    <tr>
+    <td>
+    measuredAt
+    </td>
+    <td>
+    string (ISO Date)
+    </td>
+    <td>
+    ✅
+    </td>
+    <td>
+    측정 시각
+    </td>
+    </tr>
+    <tr>
+    <td>
+    measuredDate
+    </td>
+    <td>
+    string (YYYY-MM-DD)
+    </td>
+    <td>
+    ✅
+    </td>
+    <td>
+    측정 날짜
+    </td>
+    </tr>
+    <tr>
+    <td>
+    timeSlot
+    </td>
+    <td>
+    string
+    </td>
+    <td>
+    ✅
+    </td>
+    <td>
+    시간대 구분 (예: 오전, 오후 등)
+    </td>
+    </tr>
+    <tr>
+    <td>
+    avgDecibel
+    </td>
+    <td>
+    number
+    </td>
+    <td>
+    ❌
+    </td>
+    <td>
+    평균 소음 (dB)
+    </td>
+    </tr>
+    <tr>
+    <td>
+    maxDecibel
+    </td>
+    <td>
+    number
+    </td>
+    <td>
+    ❌
+    </td>
+    <td>
+    최대 소음 (dB)
+    </td>
+    </tr>
+    <tr>
+    <td>
+    comment
+    </td>
+    <td>
+    number
+    </td>
+    <td>
+    ❌
+    </td>
+    <td>
+    사용자 코멘트
+    </td>
+    </tr>
+    </tbody>
+    </table>
 
 - Response
   ✅ 201 Created
@@ -625,68 +632,68 @@ or
 
 - **GET /api/kakao/search**
 - Request Parameters
-      <table>
-      <thead>
-      <tr>
-      <td>
-      Name
-      </td>
-      <td>
-      Type
-      </td>
-      <td>
-      Required
-      </td>
-      <td>
-      Description
-      </td>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-      <td>
-      keyword
-      </td>
-      <td>
-      string
-      </td>
-      <td>
-      ✅
-      </td>
-      <td>
-      검색 키워드
-      </td>
-      </tr>
-      <tr>
-      <td>
-      lat
-      </td>
-      <td>
-      string
-      </td>
-      <td>
-      ✅
-      </td>
-      <td>
-      지도 중심의 위도
-      </td>
-      </tr>
-      <tr>
-      <td>
-      lng
-      </td>
-      <td>
-      string
-      </td>
-      <td>
-      ✅
-      </td>
-      <td>
-      지도 중심의 경도
-      </td>
-      </tr>
-      </tbody>
-      </table>
+    <table>
+    <thead>
+    <tr>
+    <td>
+    Name
+    </td>
+    <td>
+    Type
+    </td>
+    <td>
+    Required
+    </td>
+    <td>
+    Description
+    </td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>
+    keyword
+    </td>
+    <td>
+    string
+    </td>
+    <td>
+    ✅
+    </td>
+    <td>
+    검색 키워드
+    </td>
+    </tr>
+    <tr>
+    <td>
+    lat
+    </td>
+    <td>
+    string
+    </td>
+    <td>
+    ✅
+    </td>
+    <td>
+    지도 중심의 위도
+    </td>
+    </tr>
+    <tr>
+    <td>
+    lng
+    </td>
+    <td>
+    string
+    </td>
+    <td>
+    ✅
+    </td>
+    <td>
+    지도 중심의 경도
+    </td>
+    </tr>
+    </tbody>
+    </table>
 
 - Response
   ✅ 200 OK
@@ -728,110 +735,110 @@ or
 
 - **GET /api/map**
 - Request Parameters
-      <table>
-      <thead>
-      <tr>
-      <td>
-      Name
-      </td>
-      <td>
-      Type
-      </td>
-      <td>
-      Required
-      </td>
-      <td>
-      Description
-      </td>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-      <td>
-      swLat
-      </td>
-      <td>
-      number
-      </td>
-      <td>
-      ✅
-      </td>
-      <td>
-      현재 지도 화면의 남서(South-West) 위도
-      </td>
-      </tr>
-      <tr>
-      <td>
-      swLng
-      </td>
-      <td>
-      number
-      </td>
-      <td>
-      ✅
-      </td>
-      <td>
-      현재 지도 화면의 남서(South-West) 경도
-      </td>
-      </tr>
-      <tr>
-      <td>
-      neLat
-      </td>
-      <td>
-      number
-      </td>
-      <td>
-      ✅
-      </td>
-      <td>
-      현재 지도 화면의 북동(North-East) 위도
-      </td>
-      </tr>
-      <tr>
-      <td>
-      neLng
-      </td>
-      <td>
-      number
-      </td>
-      <td>
-      ✅
-      </td>
-      <td>
-      현재 지도 화면의 북동(North-East) 경도
-      </td>
-      </tr>
-      <tr>
-      <td>
-      categories
-      </td>
-      <td>
-      string[]
-      </td>
-      <td>
-      ❌
-      </td>
-      <td>
-      카테고리 코드 배열 (CT1, AT4, FD6, CE7)
-      </td>
-      </tr>
-      <tr>
-      <td>
-      noiseLevels
-      </td>
-      <td>
-      string[]
-      </td>
-      <td>
-      ❌
-      </td>
-      <td>
-      소음 단계 (quiet, moderate, loud)
-      </td>
-      </tr>
-      </tbody>
-      </table>
+    <table>
+    <thead>
+    <tr>
+    <td>
+    Name
+    </td>
+    <td>
+    Type
+    </td>
+    <td>
+    Required
+    </td>
+    <td>
+    Description
+    </td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>
+    swLat
+    </td>
+    <td>
+    number
+    </td>
+    <td>
+    ✅
+    </td>
+    <td>
+    현재 지도 화면의 남서(South-West) 위도
+    </td>
+    </tr>
+    <tr>
+    <td>
+    swLng
+    </td>
+    <td>
+    number
+    </td>
+    <td>
+    ✅
+    </td>
+    <td>
+    현재 지도 화면의 남서(South-West) 경도
+    </td>
+    </tr>
+    <tr>
+    <td>
+    neLat
+    </td>
+    <td>
+    number
+    </td>
+    <td>
+    ✅
+    </td>
+    <td>
+    현재 지도 화면의 북동(North-East) 위도
+    </td>
+    </tr>
+    <tr>
+    <td>
+    neLng
+    </td>
+    <td>
+    number
+    </td>
+    <td>
+    ✅
+    </td>
+    <td>
+    현재 지도 화면의 북동(North-East) 경도
+    </td>
+    </tr>
+    <tr>
+    <td>
+    categories
+    </td>
+    <td>
+    string[]
+    </td>
+    <td>
+    ❌
+    </td>
+    <td>
+    카테고리 코드 배열 (CT1, AT4, FD6, CE7)
+    </td>
+    </tr>
+    <tr>
+    <td>
+    noiseLevels
+    </td>
+    <td>
+    string[]
+    </td>
+    <td>
+    ❌
+    </td>
+    <td>
+    소음 단계 (quiet, moderate, loud)
+    </td>
+    </tr>
+    </tbody>
+    </table>
 
 - Response
   ✅ 200 OK
@@ -871,44 +878,44 @@ or
 
 [맨 위로](#-목차)
 
-### 특정 장소에 대한 시간대별 평균 소음 데이터 및 최근 코멘트 목록 조회
+### 특정 장소에 대한 집계 소음 데이터 및 최근 코멘트 조회
 
 - **GET /api/map/place-detail/[id]**
 - Path Parameter
-      <table>
-      <thead>
-      <tr>
-      <td>
-      Name
-      </td>
-      <td>
-      Type
-      </td>
-      <td>
-      Required
-      </td>
-      <td>
-      Description
-      </td>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-      <td>
-      id
-      </td>
-      <td>
-      string
-      </td>
-      <td>
-      ✅
-      </td>
-      <td>
-      장소 ObjectId
-      </td>
-      </tr>
-      </tbody>
-      </table>
+    <table>
+    <thead>
+    <tr>
+    <td>
+    Name
+    </td>
+    <td>
+    Type
+    </td>
+    <td>
+    Required
+    </td>
+    <td>
+    Description
+    </td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>
+    id
+    </td>
+    <td>
+    string
+    </td>
+    <td>
+    ✅
+    </td>
+    <td>
+    장소 ObjectId
+    </td>
+    </tr>
+    </tbody>
+    </table>
 
 - Response
   ✅ 200 OK
@@ -944,6 +951,8 @@ or
 }
 ```
 
+=> chart 데이터는 Place.timeSlotStats에 저장된 시간대별 누적 통계 데이터를 기반으로 계산됩니다.
+
 ❌ 500 Server Error
 
 ```js
@@ -961,54 +970,54 @@ or
 
 - **GET /api/get-list**
 - Request(header)
-      <table>
-      <thead>
-      <tr>
-      <td>
-      Key
-      </td>
-      <td>
-      Type
-      </td>
-      <td>
-      Required
-      </td>
-      <td>
-      Description
-      </td>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-      <td>
-      Authorization
-      </td>
-      <td>
-      string
-      </td>
-      <td>
-      ✅
-      </td>
-      <td>
-      Bearer {accessToken} 형식
-      </td>
-      </tr>
-      <tr>
-      <td>
-      Cookie
-      </td>
-      <td>
-      string
-      </td>
-      <td>
-      ✅
-      </td>
-      <td>
-      refreshToken 포함
-      </td>
-      </tr>
-      </tbody>
-      </table>
+    <table>
+    <thead>
+    <tr>
+    <td>
+    Key
+    </td>
+    <td>
+    Type
+    </td>
+    <td>
+    Required
+    </td>
+    <td>
+    Description
+    </td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>
+    Authorization
+    </td>
+    <td>
+    string
+    </td>
+    <td>
+    ✅
+    </td>
+    <td>
+    Bearer {accessToken} 형식
+    </td>
+    </tr>
+    <tr>
+    <td>
+    Cookie
+    </td>
+    <td>
+    string
+    </td>
+    <td>
+    ✅
+    </td>
+    <td>
+    refreshToken 포함
+    </td>
+    </tr>
+    </tbody>
+    </table>
 
 - Response
   ✅ 성공 (200)
@@ -1063,40 +1072,40 @@ or
 - **GET /api/get-measurement/[id]**
 - **Request**
   (1) path Parameter</br>
-  <table>
-  <thead>
-  <tr>
-  <td>
-  Key
-  </td>
-  <td>
-  Type
-  </td>
-  <td>
-  Required
-  </td>
-  <td>
-  Description
-  </td>
-  </tr>
-  </thead>
-  <tbody>
-  <tr>
-  <td>
-  id
-  </td>
-  <td>
-  string
-  </td>
-  <td>
-  ✅
-  </td>
-  <td>
-  조회할 측정 데이터 ID
-  </td>
-  </tr>
-  </tbody>
-  </table>
+      <table>
+      <thead>
+      <tr>
+      <td>
+      Key
+      </td>
+      <td>
+      Type
+      </td>
+      <td>
+      Required
+      </td>
+      <td>
+      Description
+      </td>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td>
+      id
+      </td>
+      <td>
+      string
+      </td>
+      <td>
+      ✅
+      </td>
+      <td>
+      조회할 측정 데이터 ID
+      </td>
+      </tr>
+      </tbody>
+      </table>
 
 (2) Headers</br>
 
@@ -1229,40 +1238,40 @@ or
 - **DELETE /api/delete-measurement/[id]**
 - Request
   (1) path Parameter</br>
-  <table>
-  <thead>
-  <tr>
-  <td>
-  Key
-  </td>
-  <td>
-  Type
-  </td>
-  <td>
-  Required
-  </td>
-  <td>
-  Description
-  </td>
-  </tr>
-  </thead>
-  <tbody>
-  <tr>
-  <td>
-  id
-  </td>
-  <td>
-  string
-  </td>
-  <td>
-  ✅
-  </td>
-  <td>
-  삭제할 측정 데이터 ID
-  </td>
-  </tr>
-  </tbody>
-  </table>
+      <table>
+      <thead>
+      <tr>
+      <td>
+      Key
+      </td>
+      <td>
+      Type
+      </td>
+      <td>
+      Required
+      </td>
+      <td>
+      Description
+      </td>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td>
+      id
+      </td>
+      <td>
+      string
+      </td>
+      <td>
+      ✅
+      </td>
+      <td>
+      삭제할 측정 데이터 ID
+      </td>
+      </tr>
+      </tbody>
+      </table>
 
 (2) Headers</br>
 
@@ -1518,5 +1527,31 @@ or
 - kakaoMap의 bounds를 활용한 상태 관리 도입 및 Debounce 도입
 - marker image cache 도입
 - Place Schema에 avgDecibelCached, MeasurementCount 필드 도입
+
+### 2026.06.10 ~ 2026.06.12
+
+1. Place 집계 필드 도입
+
+- 기존 구조
+
+Measurement Collection
+→ Aggregate 수행
+→ 시간대별 평균 계산
+
+- 변경 후
+
+Place Collection에
+
+- totalDecibel
+- measurementCount
+- avgDecibelCached
+- timeSlotStats
+
+를 유지하여 조회 시 Aggregate를 제거했습니다.
+
+결과
+
+- Place Detail API 응답시간 약 85~95% 감소
+- 100,000건 측정 데이터 환경에서도 안정적인 응답 성능 확보
 
 [맨 위로](#-목차)
